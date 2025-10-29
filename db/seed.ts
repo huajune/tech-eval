@@ -20,87 +20,111 @@ async function seed() {
   console.log("🌱 开始种子数据导入...");
 
   try {
-    // 1. 创建默认考试模板
-    console.log("📝 创建考试模板...");
-    const exams = await db
-      .insert(examsTable)
-      .values([
-        {
-          name: "前端工程师能力评估-TypeScript-Next.js",
-          description: "面向前端工程师的技术能力评估，重点考察React/Next.js开发能力",
-          role: "frontend",
-          language: "typescript",
-          framework: "nextjs",
-          durationMinutes: 10,
-          passingScore: 60,
-          totalQuestions: 20,
-          isActive: true,
-        },
-        {
-          name: "前端工程师能力评估-TypeScript-React",
-          description: "面向前端工程师的技术能力评估，重点考察React开发能力",
-          role: "frontend",
-          language: "typescript",
-          framework: "react",
-          durationMinutes: 10,
-          passingScore: 60,
-          totalQuestions: 20,
-          isActive: true,
-        },
-        {
-          name: "后端工程师能力评估-Java-Spring",
-          description: "面向后端工程师的技术能力评估，重点考察Spring Boot开发能力",
-          role: "backend",
-          language: "java",
-          framework: "spring",
-          durationMinutes: 10,
-          passingScore: 60,
-          totalQuestions: 20,
-          isActive: true,
-        },
-        {
-          name: "后端工程师能力评估-Python-Django",
-          description: "面向后端工程师的技术能力评估，重点考察Django开发能力",
-          role: "backend",
-          language: "python",
-          framework: "django",
-          durationMinutes: 10,
-          passingScore: 60,
-          totalQuestions: 20,
-          isActive: true,
-        },
-        {
-          name: "后端工程师能力评估-TypeScript-Express",
-          description: "面向后端工程师的技术能力评估，重点考察Node.js/Express开发能力",
-          role: "backend",
-          language: "typescript",
-          framework: "express",
-          durationMinutes: 10,
-          passingScore: 60,
-          totalQuestions: 20,
-          isActive: true,
-        },
-        {
-          name: "全栈工程师能力评估-TypeScript",
-          description: "面向全栈工程师的技术能力评估，综合考察前后端开发能力",
-          role: "fullstack",
-          language: "typescript",
-          framework: "nextjs",
-          durationMinutes: 10,
-          passingScore: 60,
-          totalQuestions: 20,
-          isActive: true,
-        },
-      ])
-      .returning();
+    // 1. 创建/更新默认考试模板（使用UPSERT策略）
+    console.log("📝 创建/更新考试模板...");
 
-    console.log(`✅ 创建了 ${exams.length} 个考试模板`);
+    const examTemplates = [
+      {
+        name: "前端工程师能力评估-TypeScript-Next.js",
+        description: "面向前端工程师的技术能力评估，重点考察React/Next.js开发能力",
+        role: "frontend",
+        language: "typescript",
+        framework: "nextjs",
+        durationMinutes: 10,
+        passingScore: 60,
+        totalQuestions: 20,
+        isActive: true,
+      },
+      {
+        name: "前端工程师能力评估-TypeScript-React",
+        description: "面向前端工程师的技术能力评估，重点考察React开发能力",
+        role: "frontend",
+        language: "typescript",
+        framework: "react",
+        durationMinutes: 10,
+        passingScore: 60,
+        totalQuestions: 20,
+        isActive: true,
+      },
+      {
+        name: "后端工程师能力评估-Java-Spring",
+        description: "面向后端工程师的技术能力评估，重点考察Spring Boot开发能力",
+        role: "backend",
+        language: "java",
+        framework: "spring",
+        durationMinutes: 10,
+        passingScore: 60,
+        totalQuestions: 20,
+        isActive: true,
+      },
+      {
+        name: "后端工程师能力评估-Python-Django",
+        description: "面向后端工程师的技术能力评估，重点考察Django开发能力",
+        role: "backend",
+        language: "python",
+        framework: "django",
+        durationMinutes: 10,
+        passingScore: 60,
+        totalQuestions: 20,
+        isActive: true,
+      },
+      {
+        name: "后端工程师能力评估-TypeScript-Express",
+        description: "面向后端工程师的技术能力评估，重点考察Node.js/Express开发能力",
+        role: "backend",
+        language: "typescript",
+        framework: "express",
+        durationMinutes: 10,
+        passingScore: 60,
+        totalQuestions: 20,
+        isActive: true,
+      },
+      {
+        name: "全栈工程师能力评估-TypeScript",
+        description: "面向全栈工程师的技术能力评估，综合考察前后端开发能力",
+        role: "fullstack",
+        language: "typescript",
+        framework: "nextjs",
+        durationMinutes: 10,
+        passingScore: 60,
+        totalQuestions: 20,
+        isActive: true,
+      },
+    ];
+
+    // 为每个模板生成稳定的UUID（基于role+language+framework）
+    const examsWithIds = examTemplates.map((exam) => {
+      const identifier = `exam:${exam.role}:${exam.language}:${exam.framework || 'default'}`;
+      const id = uuidv5(identifier, QUESTION_NAMESPACE);
+      return { ...exam, id };
+    });
+
+    // UPSERT每个模板
+    for (const exam of examsWithIds) {
+      await db
+        .insert(examsTable)
+        .values(exam)
+        .onConflictDoUpdate({
+          target: examsTable.id,
+          set: {
+            name: sql`EXCLUDED.name`,
+            description: sql`EXCLUDED.description`,
+            durationMinutes: sql`EXCLUDED.duration_minutes`,
+            passingScore: sql`EXCLUDED.passing_score`,
+            totalQuestions: sql`EXCLUDED.total_questions`,
+            isActive: sql`EXCLUDED.is_active`,
+            updatedAt: sql`NOW()`,
+          },
+        });
+    }
+
+    console.log(`✅ 处理了 ${examsWithIds.length} 个考试模板`);
 
     // 2. 导入题库（使用UPSERT策略）
     console.log("📚 导入/更新题库...");
 
     // 为每道题目生成稳定的UUID（基于题目内容，确保幂等性）
-    const addStableIds = (questions: any[], prefix: string) => {
+    const addStableIds = <T extends { content: string }>(questions: T[], prefix: string) => {
       return questions.map((q) => {
         // 基于题目内容生成UUID，确保：
         // 1. 题目内容不变 → UUID不变 → UPSERT能正确更新

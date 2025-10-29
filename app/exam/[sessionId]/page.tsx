@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,6 +48,10 @@ export default function ExamPage() {
   const [saving, setSaving] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+
+  // Debounce timer for essay questions
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingSaveRef = useRef<{ questionId: string; answer: string[] } | null>(null);
 
   // Anti-cheat monitoring
   const { warningCount } = useAntiCheat({
@@ -166,7 +170,7 @@ export default function ExamPage() {
   };
 
   // Save answer to backend
-  const saveAnswer = async (questionId: string, answer: string[]) => {
+  const saveAnswer = useCallback(async (questionId: string, answer: string[]) => {
     setSaving(true);
     try {
       const response = await fetch("/api/exam/save-answer", {
@@ -184,19 +188,67 @@ export default function ExamPage() {
         throw new Error(error.error || "保存答案失败");
       }
 
-      // Update local state
-      setAnswers((prev) => new Map(prev).set(questionId, answer));
+      // 不需要再更新本地状态，已在handleAnswerChange中更新
     } catch (error) {
+      console.error("保存答案失败：", error);
       alert(error instanceof Error ? error.message : "保存答案失败");
     } finally {
       setSaving(false);
     }
-  };
+  }, [sessionId]);
 
   // Handle answer change
-  const handleAnswerChange = (questionId: string, answer: string[]) => {
-    saveAnswer(questionId, answer);
+  const handleAnswerChange = (questionId: string, answer: string[], isEssay = false) => {
+    // 立即更新本地状态（提升用户体验）
+    setAnswers((prev) => new Map(prev).set(questionId, answer));
+
+    if (isEssay) {
+      // 简答题：使用防抖，1秒后保存
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+
+      // 记录pending save
+      pendingSaveRef.current = { questionId, answer };
+
+      debounceTimerRef.current = setTimeout(() => {
+        saveAnswer(questionId, answer);
+        pendingSaveRef.current = null;
+      }, 1000); // 1秒防抖
+    } else {
+      // 选择题：立即保存
+      saveAnswer(questionId, answer);
+    }
   };
+
+  // Cleanup debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Flush pending saves before navigation or submit
+  const flushPendingSaves = useCallback(async () => {
+    // 清除防抖定时器
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+
+    // 递归保存所有pending，直到没有新的pending为止
+    while (pendingSaveRef.current) {
+      // 先拷贝当前pending引用（避免在保存期间被覆盖）
+      const pending = pendingSaveRef.current;
+      // 立即清空，让新的输入可以设置新的pending
+      pendingSaveRef.current = null;
+      // 等待当前pending保存完成
+      await saveAnswer(pending.questionId, pending.answer);
+      // 循环检查是否在保存期间又有新的pending（用户继续输入）
+    }
+  }, [saveAnswer]);
 
   // Submit exam
   const handleSubmit = async (isAutoSubmit = false) => {
@@ -212,6 +264,9 @@ export default function ExamPage() {
 
     setSubmitting(true);
     try {
+      // 确保所有pending的保存都完成（必须等待）
+      await flushPendingSaves();
+
       const response = await fetch("/api/exam/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -390,8 +445,11 @@ export default function ExamPage() {
                     maxLength={150}
                     value={answers.get(currentQuestion.id)?.[0] || ""}
                     onChange={(e) =>
-                      handleAnswerChange(currentQuestion.id, [e.target.value])
+                      handleAnswerChange(currentQuestion.id, [e.target.value], true)
                     }
+                    onPaste={(e) => e.preventDefault()}
+                    onCopy={(e) => e.preventDefault()}
+                    onCut={(e) => e.preventDefault()}
                     className="resize-none"
                   />
                   <p className="text-sm text-muted-foreground text-right">

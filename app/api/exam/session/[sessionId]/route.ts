@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { db } from "@/db";
 import {
   examSessionsTable,
+  examsTable,
   usersTable,
   questionsTable,
   answersTable,
@@ -78,10 +79,23 @@ export async function GET(
       );
     }
 
-    // 6. Check if time expired
+    // 6. Get exam template to retrieve duration
+    const exams = await db
+      .select()
+      .from(examsTable)
+      .where(eq(examsTable.id, session.examId))
+      .limit(1);
+
+    if (exams.length === 0) {
+      return NextResponse.json({ error: "考试模板不存在" }, { status: 404 });
+    }
+
+    const exam = exams[0];
+
+    // 7. Check if time expired (use exam template duration)
     const startTime = new Date(session.startTime);
     const elapsedMs = Date.now() - startTime.getTime();
-    const maxDurationMs = 10 * 60 * 1000; // 10 minutes
+    const maxDurationMs = exam.durationMinutes * 60 * 1000;
 
     if (elapsedMs > maxDurationMs) {
       // Auto-submit if time expired
@@ -107,7 +121,7 @@ export async function GET(
       );
     }
 
-    // 7. Get questions
+    // 8. Get questions
     const selectedQuestionIds = session.selectedQuestions as string[];
     const questions = await db
       .select()
@@ -119,7 +133,7 @@ export async function GET(
       .map((id) => questions.find((q) => q.id === id))
       .filter((q) => q !== undefined);
 
-    // 8. Get user's answers
+    // 9. Get user's answers
     const answers = await db
       .select()
       .from(answersTable)
@@ -130,13 +144,13 @@ export async function GET(
       answers.map((a) => [a.questionId, a.userAnswer as string[]])
     );
 
-    // 9. Sanitize questions and attach user answers
+    // 10. Sanitize questions and attach user answers
     const sanitizedQuestions = sanitizeQuestions(orderedQuestions).map((q) => ({
       ...q,
       userAnswer: answersMap.get(q.id) || null,
     }));
 
-    // 10. Calculate remaining time
+    // 11. Calculate remaining time
     const remainingSeconds = Math.max(
       0,
       Math.floor((maxDurationMs - elapsedMs) / 1000)
@@ -148,7 +162,7 @@ export async function GET(
         status: session.status,
         startTime: session.startTime,
         remainingSeconds,
-        durationMinutes: 10,
+        durationMinutes: exam.durationMinutes,
         questions: sanitizedQuestions,
       },
       { status: 200 }

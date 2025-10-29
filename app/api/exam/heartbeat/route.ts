@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/db";
-import { examSessionsTable, usersTable } from "@/db/schema";
+import { examSessionsTable, examsTable, usersTable } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { calculateExamResult } from "@/lib/exam/scoring";
 import { NextResponse } from "next/server";
@@ -99,15 +99,28 @@ export async function POST(request: Request) {
       );
     }
 
-    // 6. 计算剩余时间（服务端计时）
+    // 6. 获取考试模板以获取时长配置
+    const exams = await db
+      .select()
+      .from(examsTable)
+      .where(eq(examsTable.id, session.examId))
+      .limit(1);
+
+    if (exams.length === 0) {
+      return NextResponse.json({ error: "考试模板不存在" }, { status: 404 });
+    }
+
+    const exam = exams[0];
+
+    // 7. 计算剩余时间（使用模板配置）
     const startTime = new Date(session.startTime);
     const now = new Date();
     const elapsedMs = now.getTime() - startTime.getTime();
-    const maxDurationMs = 10 * 60 * 1000; // 10 minutes
+    const maxDurationMs = exam.durationMinutes * 60 * 1000;
     const remainingMs = Math.max(0, maxDurationMs - elapsedMs);
     const remainingSeconds = Math.floor(remainingMs / 1000);
 
-    // 7. 时间到自动提交
+    // 8. 时间到自动提交
     if (remainingSeconds <= 0) {
       // 自动提交考试
       await db
@@ -136,7 +149,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 8. 返回剩余时间
+    // 9. 返回剩余时间
     return NextResponse.json(
       {
         remainingSeconds,

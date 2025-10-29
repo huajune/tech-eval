@@ -90,11 +90,21 @@ export default function ExamSetupPage() {
     { value: "fullstack", label: "全栈工程师" },
   ];
 
-  const languageOptions = [
-    { value: "typescript", label: "TypeScript" },
-    { value: "java", label: "Java" },
-    { value: "python", label: "Python" },
-  ];
+  // 根据角色动态获取可选语言
+  const getLanguageOptions = () => {
+    // 全栈工程师目前只支持TypeScript
+    if (role === "fullstack") {
+      return [{ value: "typescript", label: "TypeScript" }];
+    }
+    // 其他角色支持所有语言
+    return [
+      { value: "typescript", label: "TypeScript" },
+      { value: "java", label: "Java" },
+      { value: "python", label: "Python" },
+    ];
+  };
+
+  const languageOptions = getLanguageOptions();
 
   const getFrameworkOptions = () => {
     if (role === "frontend" && language === "typescript") {
@@ -111,6 +121,9 @@ export default function ExamSetupPage() {
     }
     if (role === "backend" && language === "typescript") {
       return [{ value: "express", label: "Express.js" }];
+    }
+    if (role === "fullstack" && language === "typescript") {
+      return [{ value: "nextjs", label: "Next.js" }];
     }
     return [];
   };
@@ -317,8 +330,16 @@ export default function ExamSetupPage() {
                     value={option.value}
                     checked={role === option.value}
                     onChange={(e) => {
-                      setRole(e.target.value);
+                      const newRole = e.target.value;
+                      setRole(newRole);
+                      // 重置框架
                       setFramework("");
+                      // 如果是全栈，自动设置为TypeScript；否则重置语言选择
+                      if (newRole === "fullstack") {
+                        setLanguage("typescript");
+                      } else {
+                        setLanguage("");
+                      }
                     }}
                     className="h-4 w-4"
                   />
@@ -390,7 +411,12 @@ export default function ExamSetupPage() {
           {/* 提交按钮 */}
           <Button
             onClick={handleSubmit}
-            disabled={loading || !role || !language}
+            disabled={
+              loading ||
+              !role ||
+              !language ||
+              (frameworkOptions.length > 0 && !framework)
+            }
             className="w-full"
             size="lg"
           >

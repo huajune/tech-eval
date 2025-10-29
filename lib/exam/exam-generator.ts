@@ -147,7 +147,7 @@ export async function generateExamQuestions(
 
     const grouped = groupQuestions(typedQuestions);
 
-    // 3. 按策略抽题
+    // 3. 按策略抽题（优先抽取简答题）
     const selected: Question[] = [];
     const errors: string[] = [];
 
@@ -165,8 +165,30 @@ export async function generateExamQuestions(
             );
             selected.push(...pool);
           } else {
-            // 随机选择指定数量的题目
-            const picked = selectRandom(pool, count);
+            // 优先抽取简答题，确保简答题能被选中
+            const essayPool = pool.filter(q => q.type === 'essay');
+            const choicePool = pool.filter(q => q.type !== 'essay');
+
+            const picked: Question[] = [];
+
+            // 先从简答题池中抽取（如果有）
+            if (essayPool.length > 0) {
+              const essayCount = Math.min(count, essayPool.length);
+              picked.push(...selectRandom(essayPool, essayCount));
+            }
+
+            // 再从选择题池中补充剩余数量
+            const remainingCount = count - picked.length;
+            if (remainingCount > 0 && choicePool.length >= remainingCount) {
+              picked.push(...selectRandom(choicePool, remainingCount));
+            } else if (remainingCount > 0) {
+              // 选择题不足，记录错误
+              errors.push(
+                `${dimension} - ${difficulty} 选择题不足：需要${remainingCount}题，实际${choicePool.length}题`
+              );
+              picked.push(...choicePool);
+            }
+
             selected.push(...picked);
           }
         }

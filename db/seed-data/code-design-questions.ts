@@ -1,5 +1,5 @@
 export const codeDesignQuestions = [
-  // 简单题（17题）
+  // 简单题（22题）
   {
     content: "在React函数组件中，以下哪种方式最符合处理副作用的最佳实践？",
     type: "single",
@@ -271,6 +271,91 @@ export const codeDesignQuestions = [
     applicableRoles: ["frontend", "fullstack"],
     applicableLanguages: ["typescript"],
     explanation: "key帮助React识别列表中元素的变化，避免不必要的重新渲染。使用索引作为key在列表项顺序改变时会导致问题，应该使用稳定的唯一标识。"
+  },
+  {
+    content: "在Spring Boot中，以下关于依赖注入（Dependency Injection）的说法哪个是正确的？",
+    type: "single",
+    options: {
+      A: "@Autowired注解可以注入接口的实现类",
+      B: "必须使用XML配置才能实现依赖注入",
+      C: "依赖注入会降低代码性能，不建议使用",
+      D: "只能通过构造函数进行依赖注入"
+    },
+    correctAnswer: ["A"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend", "fullstack"],
+    applicableLanguages: ["java"],
+    explanation: "@Autowired可以自动注入Spring容器中的Bean，包括接口的实现类。Spring Boot推荐使用注解配置而非XML。依赖注入是Spring的核心特性，提高了代码的可测试性和解耦性。虽然构造函数注入是推荐方式，但也支持字段注入和setter注入。"
+  },
+  {
+    content: "Java中，以下关于访问修饰符的说法哪个是正确的？",
+    type: "single",
+    options: {
+      A: "private成员可以被同一个包中的其他类访问",
+      B: "protected成员可以被不同包的子类访问",
+      C: "默认（无修饰符）成员可以被任何类访问",
+      D: "public成员只能在同一个类中访问"
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend", "fullstack"],
+    applicableLanguages: ["java"],
+    explanation: "Java访问修饰符范围：private（仅本类）< 默认/package-private（同包）< protected（同包+子类）< public（所有）。protected成员可以被同包类和不同包的子类访问。"
+  },
+  {
+    content: "在Java中，以下关于String类的说法哪个是正确的？",
+    type: "single",
+    options: {
+      A: "String对象是可变的，可以直接修改内容",
+      B: "使用+拼接大量字符串时性能最好",
+      C: "String对象存储在字符串常量池中，相同内容的字符串会共享同一个对象",
+      D: "String和StringBuilder性能完全相同"
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend", "fullstack"],
+    applicableLanguages: ["java"],
+    explanation: "String是不可变类，相同内容的字符串字面量会存储在字符串常量池中并共享。大量拼接应使用StringBuilder以避免创建多个临时对象。"
+  },
+  {
+    content: "Python中，以下关于列表（list）的说法哪个是正确的？",
+    type: "single",
+    options: {
+      A: "列表是不可变类型，不能修改元素",
+      B: "列表只能存储相同类型的元素",
+      C: "列表可以存储不同类型的元素，且支持动态增删",
+      D: "列表访问元素的时间复杂度是O(n)"
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend", "fullstack"],
+    applicableLanguages: ["python"],
+    explanation: "Python列表是可变的动态数组，可以存储不同类型的元素，支持append、remove等操作。访问元素通过索引是O(1)时间复杂度。"
+  },
+  {
+    content: "Python中，以下哪种方式可以正确定义一个函数的默认参数？",
+    type: "single",
+    options: {
+      A: "def func(x, y=[]): pass",
+      B: "def func(x, y=None): y = y or []",
+      C: "def func(x, y=None): y = y if y is not None else []",
+      D: "选项B和C都可以，但C更严谨"
+    },
+    correctAnswer: ["D"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend", "fullstack"],
+    applicableLanguages: ["python"],
+    explanation: "避免使用可变对象（如[]、{}）作为默认参数，因为它们在函数定义时只创建一次。应该使用None作为默认值，然后在函数体内初始化。选项C更严谨，因为y=[]是合法参数而y or []会将其视为假值。"
   },
 
   // 中等题（8题）

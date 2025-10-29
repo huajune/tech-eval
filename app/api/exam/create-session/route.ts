@@ -83,16 +83,22 @@ export async function POST(request: Request) {
     }
 
     // 5. 查找对应的考试模板
+    // 构建查询条件：role、language、isActive是必须的，framework是可选的
+    const whereConditions = [
+      eq(examsTable.role, role),
+      eq(examsTable.language, language),
+      eq(examsTable.isActive, true),
+    ];
+
+    // 如果提供了framework，则添加到查询条件中
+    if (framework) {
+      whereConditions.push(eq(examsTable.framework, framework));
+    }
+
     const exams = await db
       .select()
       .from(examsTable)
-      .where(
-        and(
-          eq(examsTable.role, role),
-          eq(examsTable.language, language),
-          eq(examsTable.isActive, true)
-        )
-      )
+      .where(and(...whereConditions))
       .limit(1);
 
     if (exams.length === 0) {
@@ -114,7 +120,15 @@ export async function POST(request: Request) {
       );
     }
 
-    // 7. 创建考试会话
+    // 验证题目数量是否符合模板要求
+    if (questions.length !== exam.totalQuestions) {
+      console.warn(
+        `题目数量不匹配：期望${exam.totalQuestions}题，实际生成${questions.length}题`
+      );
+    }
+
+    // 7. 创建考试会话（使用模板配置）
+    const durationSeconds = exam.durationMinutes * 60;
     const sessions = await db
       .insert(examSessionsTable)
       .values({
@@ -123,7 +137,7 @@ export async function POST(request: Request) {
         status: "in_progress",
         selectedQuestions: questions.map((q) => q.id),
         startTime: new Date(),
-        remainingSeconds: 600,
+        remainingSeconds: durationSeconds,
         cheatingWarnings: 0,
       })
       .returning();
@@ -137,8 +151,8 @@ export async function POST(request: Request) {
       {
         sessionId: session.id,
         startTime: session.startTime,
-        durationMinutes: 10,
-        remainingSeconds: 600,
+        durationMinutes: exam.durationMinutes,
+        remainingSeconds: durationSeconds,
         questions: sanitizedQuestions,
       },
       { status: 200 }
