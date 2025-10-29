@@ -27,11 +27,44 @@ export default async function Home() {
 
   let userRole: string | null = null;
   if (user) {
-    const dbUsers = await db
+    let dbUsers = await db
       .select()
       .from(usersTable)
       .where(eq(usersTable.authUserId, user.id))
       .limit(1);
+
+    // 如果用户不存在于数据库，自动创建默认记录
+    if (dbUsers.length === 0) {
+      try {
+        const newUsers = await db
+          .insert(usersTable)
+          .values({
+            authUserId: user.id,
+            email: user.email || "",
+            role: "candidate", // 默认为候选人角色
+            profileCompleted: false,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .returning();
+
+        dbUsers = newUsers;
+        console.log(`自动创建用户记录: ${user.email}`);
+      } catch (error) {
+        // 并发情况：如果是唯一约束冲突（其他请求已创建），重新查询
+        const errorMessage = error instanceof Error ? error.message : "";
+        if (errorMessage.includes("unique") || errorMessage.includes("duplicate")) {
+          console.log(`用户记录已存在（并发创建），重新查询: ${user.email}`);
+          dbUsers = await db
+            .select()
+            .from(usersTable)
+            .where(eq(usersTable.authUserId, user.id))
+            .limit(1);
+        } else {
+          console.error("创建用户记录失败：", error);
+        }
+      }
+    }
 
     if (dbUsers.length > 0) {
       userRole = dbUsers[0].role;

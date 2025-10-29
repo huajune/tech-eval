@@ -48,7 +48,11 @@ export function SignUpForm({
         },
       });
       if (error) throw error;
-      router.push("/auth/sign-up-success");
+
+      // 注册成功，直接跳转到首页
+      // 注意：如果Supabase配置了邮箱验证，用户需要先验证邮箱才能登录
+      // 如果没有配置SMTP，Supabase会自动确认用户
+      router.push("/");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
