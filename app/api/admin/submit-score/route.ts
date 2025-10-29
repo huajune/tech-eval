@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/db";
-import { answersTable, usersTable } from "@/db/schema";
+import { answersTable, usersTable, questionsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { calculateExamResult } from "@/lib/exam/scoring";
 import { NextResponse } from "next/server";
@@ -49,14 +49,35 @@ export async function POST(request: Request) {
       );
     }
 
-    if (score < 0 || score > 5) {
+    // 5. 获取答案对应的题目，验证分数不超过权重
+    const answerRecords = await db
+      .select({
+        answer: answersTable,
+        question: questionsTable,
+      })
+      .from(answersTable)
+      .innerJoin(questionsTable, eq(answersTable.questionId, questionsTable.id))
+      .where(eq(answersTable.id, answerId))
+      .limit(1);
+
+    if (answerRecords.length === 0) {
       return NextResponse.json(
-        { error: "分数必须在0-5之间" },
+        { error: "答案记录不存在" },
+        { status: 404 }
+      );
+    }
+
+    const { question } = answerRecords[0];
+    const maxScore = question.weight;
+
+    if (score < 0 || score > maxScore) {
+      return NextResponse.json(
+        { error: `分数必须在0-${maxScore}之间` },
         { status: 400 }
       );
     }
 
-    // 5. Update the answer with manual score
+    // 6. Update the answer with manual score
     await db
       .update(answersTable)
       .set({
@@ -65,7 +86,7 @@ export async function POST(request: Request) {
       })
       .where(eq(answersTable.id, answerId));
 
-    // 6. Recalculate exam result
+    // 7. Recalculate exam result
     const result = await calculateExamResult(sessionId);
 
     console.log(`简答题已评分: ${answerId}, 分数: ${score}, 重新计算结果: `, result);

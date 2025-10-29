@@ -196,10 +196,15 @@ export function useAntiCheat({
     const handlePaste = (e: ClipboardEvent) => {
       // 允许在textarea中粘贴（简答题需要）
       const target = e.target as HTMLElement;
-      if (target.tagName === "TEXTAREA") {
-        return; // 允许
+
+      // 检查是否为textarea（不区分大小写）
+      if (target.tagName?.toUpperCase() === "TEXTAREA") {
+        console.log("[防作弊] 允许在简答题中粘贴");
+        return; // 允许粘贴
       }
-      e.preventDefault(); // 其他地方阻止粘贴
+
+      // 其他地方阻止粘贴
+      e.preventDefault();
       logOnly("paste");
     };
 

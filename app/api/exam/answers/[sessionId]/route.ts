@@ -53,8 +53,9 @@ export async function GET(
 
     const session = sessions[0];
 
-    // 4. Verify ownership
-    if (session.userId !== dbUser.id) {
+    // 4. Verify ownership or admin access
+    // Admin可以查看所有人的答案，candidate只能查看自己的
+    if (dbUser.role !== "admin" && session.userId !== dbUser.id) {
       return NextResponse.json({ error: "无权访问此内容" }, { status: 403 });
     }
 

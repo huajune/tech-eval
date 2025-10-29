@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 3. 检查是否已有进行中的会话
+    // 3. 检查是否已有进行中的会话，如果有则自动终止
     const existingSessions = await db
       .select()
       .from(examSessionsTable)
@@ -44,9 +44,18 @@ export async function POST(request: Request) {
       .limit(1);
 
     if (existingSessions.length > 0) {
-      return NextResponse.json(
-        { error: "已有进行中的考试，请先完成" },
-        { status: 409 }
+      // 自动终止之前的考试
+      const oldSession = existingSessions[0].exam_sessions;
+      await db
+        .update(examSessionsTable)
+        .set({
+          status: "terminated",
+          endTime: new Date(),
+        })
+        .where(eq(examSessionsTable.id, oldSession.id));
+
+      console.log(
+        `自动终止用户 ${user.id} 的旧考试会话: ${oldSession.id}`
       );
     }
 

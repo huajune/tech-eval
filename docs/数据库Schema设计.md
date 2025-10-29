@@ -22,7 +22,11 @@ erDiagram
         uuid auth_user_id UK "Supabase Auth关联"
         varchar email
         varchar full_name
+        varchar phone UK "候选人手机号"
+        varchar role "candidate/admin"
+        boolean profile_completed
         timestamp created_at
+        timestamp updated_at
     }
 
     exams {
@@ -71,8 +75,9 @@ erDiagram
         uuid question_id FK
         jsonb user_answer "用户答案"
         boolean is_correct "是否正确(选择题)"
-        integer manual_score "人工评分(陈述题)"
+        real manual_score "人工评分(陈述题，支持小数)"
         timestamp answered_at
+        timestamp graded_at
     }
 
     cheating_logs {
@@ -109,9 +114,11 @@ export const usersTable = pgTable('users', {
   auth_user_id: uuid('auth_user_id').notNull().unique(),
   email: varchar('email', { length: 255 }).notNull(),
   full_name: varchar('full_name', { length: 255 }),
-  role: varchar('role', { length: 50 }).default('candidate'), // 'candidate' | 'admin'
-  created_at: timestamp('created_at').defaultNow(),
-  updated_at: timestamp('updated_at').defaultNow(),
+  phone: varchar('phone', { length: 20 }).unique(), // 候选人手机号，唯一
+  role: varchar('role', { length: 50 }).default('candidate').notNull(), // 'candidate' | 'admin'
+  profile_completed: boolean('profile_completed').default(false).notNull(),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+  updated_at: timestamp('updated_at').defaultNow().notNull(),
 });
 ```
 
@@ -123,8 +130,9 @@ CREATE INDEX idx_users_email ON users(email);
 
 **说明：**
 - `auth_user_id`：关联到 Supabase Auth 的 `auth.users.id`
-- `role`：用于区分候选人和管理员（评阅权限）
-- MVP阶段可通过后台直接修改role字段授予管理员权限
+- `phone`：候选人必填的联系方式（大陆手机号），通过唯一约束防止重复；管理员账号可为空
+- `profile_completed`：标记候选人是否已填写必填信息，前端在创建考试前会根据该字段决定是否再次提示
+- `role`：用于区分候选人和管理员（评阅权限），MVP阶段可通过后台直接修改授予管理员权限
 
 ---
 
@@ -308,12 +316,16 @@ export const answersTable = pgTable('answers', {
   question_id: uuid('question_id').notNull().references(() => questionsTable.id, { onDelete: 'cascade' }),
   user_answer: jsonb('user_answer'), // ['A'] 或 ['A', 'C'] 或 "essay text"
   is_correct: boolean('is_correct'), // 选择题自动判定，陈述题为null
-  manual_score: integer('manual_score'), // 陈述题人工评分 0-5
+  manual_score: real('manual_score'), // 陈述题人工评分 0-weight，支持小数
   graded_by: uuid('graded_by'), // 评阅人ID（管理员）
   graded_at: timestamp('graded_at'), // 评阅时间
   answered_at: timestamp('answered_at').defaultNow(),
   updated_at: timestamp('updated_at').defaultNow(),
 });
+
+**说明：**
+- `manual_score` 采用 `real` 类型以支持0.5等小数评分（最大值由题目 `weight` 决定）
+- `graded_by` 可用于追踪评分人，MVP阶段可为空
 ```
 
 **索引：**

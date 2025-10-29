@@ -12,6 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Link from "next/link";
 
 interface EssayAnswer {
   answerId: string;
@@ -21,6 +22,7 @@ interface EssayAnswer {
   referenceAnswer: string | null;
   explanation: string | null;
   abilityDimension: string;
+  weight: number; // 题目权重（满分）
 }
 
 interface PendingSession {
@@ -65,9 +67,9 @@ export default function AdminGradingPage() {
     }
   };
 
-  const handleScoreChange = (answerId: string, value: string) => {
-    const score = parseInt(value);
-    if (!isNaN(score) && score >= 0 && score <= 5) {
+  const handleScoreChange = (answerId: string, value: string, maxScore: number) => {
+    const score = parseFloat(value);
+    if (!isNaN(score) && score >= 0 && score <= maxScore) {
       setScores((prev) => ({ ...prev, [answerId]: score }));
     }
   };
@@ -123,11 +125,16 @@ export default function AdminGradingPage() {
     <div className="container mx-auto py-8 max-w-6xl">
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold">简答题评分</h1>
-          <p className="text-muted-foreground mt-1">
-            待评分：{sessions.length} 个考试会话
-          </p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold">简答题评分</h1>
+            <p className="text-muted-foreground mt-1">
+              待评分：{sessions.length} 个考试会话
+            </p>
+          </div>
+          <Button asChild variant="outline">
+            <Link href="/">返回首页</Link>
+          </Button>
         </div>
 
         {/* Empty state */}
@@ -222,17 +229,17 @@ export default function AdminGradingPage() {
                   <div className="flex items-end gap-3 pt-3 border-t">
                     <div className="flex-1 max-w-xs">
                       <Label htmlFor={`score-${answer.answerId}`}>
-                        评分（0-5分）
+                        评分（0-{answer.weight}分）
                       </Label>
                       <Input
                         id={`score-${answer.answerId}`}
                         type="number"
                         min="0"
-                        max="5"
+                        max={answer.weight}
                         step="0.5"
                         value={scores[answer.answerId] ?? ""}
                         onChange={(e) =>
-                          handleScoreChange(answer.answerId, e.target.value)
+                          handleScoreChange(answer.answerId, e.target.value, answer.weight)
                         }
                         placeholder="输入分数"
                         className="mt-1"

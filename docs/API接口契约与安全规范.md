@@ -130,20 +130,50 @@ async function validateExamSession(sessionId: string, userId: string) {
 
 **业务逻辑：**
 1. 验证用户登录状态
-2. 检查是否有进行中的会话（同一用户同时只能有一个in_progress会话）
-3. 根据配置调用题目选择算法，抽取20题
-4. 创建会话记录（status='in_progress'）
+2. 查询是否存在 `status='in_progress'` 的旧会话；若存在且用户确认开启新考试，则自动将旧会话标记为 `terminated`（写入 `end_time`）
+3. 根据配置调用题目选择算法，抽取20题（覆盖所有能力维度）
+4. 创建新的会话记录（status='in_progress'，remaining_seconds=600）
 5. 返回脱敏后的题目列表
+
+> 前置约定：调用方需在发起本请求前保存/确认候选人的 `fullName`、`phone` 信息（见「用户资料」接口），以满足业务合规要求。
 
 **错误码：**
 - `400` - 参数错误
 - `401` - 未登录
-- `409` - 已有进行中的考试
 - `500` - 服务器错误
 
 ---
 
-### 2.2 获取会话信息（断线恢复）
+### 2.2 检查进行中的考试
+
+**端点：** `GET /api/exam/check-in-progress`
+
+**响应：**
+```typescript
+// 无进行中的考试
+{ hasInProgress: false }
+
+// 有进行中的考试
+{
+  hasInProgress: true,
+  sessionId: string,
+  examName: string,
+  startTime: string,
+  remainingSeconds: number
+}
+```
+
+**业务逻辑：**
+1. 验证用户登录状态，并获取关联的 `users` 记录
+2. 查询当前用户 `status='in_progress'` 且未超时的考试会话
+3. 若会话已超过考试时长，自动将其标记为 `terminated` 并返回 `hasInProgress=false`
+4. 否则返回会话信息，供前端提醒候选人继续或终止
+
+**使用场景：** 考试配置页/首页加载时提示候选人是否存在未完成考试
+
+---
+
+### 2.3 获取会话信息（断线恢复）
 
 **端点：** `GET /api/exam/session/:sessionId`
 
@@ -174,7 +204,7 @@ async function validateExamSession(sessionId: string, userId: string) {
 
 ---
 
-### 2.3 保存答案
+### 2.4 保存答案
 
 **端点：** `POST /api/exam/save-answer`
 
@@ -209,7 +239,7 @@ async function validateExamSession(sessionId: string, userId: string) {
 
 ---
 
-### 2.4 心跳同步
+### 2.5 心跳同步
 
 **端点：** `POST /api/exam/heartbeat`
 
@@ -246,7 +276,7 @@ async function validateExamSession(sessionId: string, userId: string) {
 
 ---
 
-### 2.5 记录作弊行为
+### 2.6 记录作弊行为
 
 **端点：** `POST /api/exam/log-cheating`
 
@@ -287,7 +317,7 @@ const CHEATING_RULES = {
 
 ---
 
-### 2.6 提交考试
+### 2.7 提交考试
 
 **端点：** `POST /api/exam/submit`
 
@@ -325,7 +355,7 @@ const CHEATING_RULES = {
 
 ---
 
-### 2.7 获取考试结果
+### 2.8 获取考试结果
 
 **端点：** `GET /api/exam/result/:sessionId`
 
@@ -333,43 +363,32 @@ const CHEATING_RULES = {
 ```typescript
 {
   session_id: string,
-  total_score: number, // 0-100
-  ability_scores: {
+  completed_at: string,
+  time_taken_minutes: number,
+  // 以下字段仅管理员返回
+  total_score?: number,
+  ability_scores?: {
     code_design: number,
     architecture: number,
     database: number,
     devops: number
   },
-  estimated_level: 'P5' | 'P6' | 'P7' | 'P8' | 'P9',
-  pass_status: boolean,
-  completed_at: string,
-
-  // 答题统计
-  answer_summary: {
-    total_questions: number,
-    correct_count: number,
-    pending_essay_count: number // 待评阅的简答题数量
-  },
-
-  // 维度分析（动态计算，不持久化）
-  strengths: string[], // ["运维能力优秀(100分)"]
-  weaknesses: string[], // ["软件架构需加强(78分)"]
+  estimated_level?: 'P5' | 'P6' | 'P7' | 'P8' | 'P9',
+  pass_status?: boolean
 }
 ```
 
 **业务逻辑：**
-1. 验证会话归属
-2. 查询exam_results表
-3. 动态计算strengths/weaknesses：
-   ```typescript
-   const sorted = Object.entries(ability_scores).sort((a, b) => b[1] - a[1]);
-   const strengths = sorted.slice(0, 2).map(/* format */);
-   const weaknesses = sorted.slice(-2).map(/* format */);
-   ```
+1. 验证会话归属；若当前用户为管理员则放宽为可访问任意会话
+2. 查询 `exam_results`、`exam_sessions` 获取分数与完成时间
+3. 计算考试耗时（分钟）
+4. 根据用户角色构建响应：
+   - 管理员：返回完整分数、能力维度、职级
+   - 候选人：隐藏分数、职级等敏感字段，仅返回考试完成时间与耗时
 
 ---
 
-### 2.8 获取答案解析
+### 2.9 获取答案解析
 
 **端点：** `GET /api/exam/answers/:sessionId`
 
@@ -386,76 +405,132 @@ const CHEATING_RULES = {
       explanation: string,
       user_answer: any,
       is_correct: boolean | null,
-      manual_score?: number // 简答题
+      manual_score?: number // 简答题，浮点数
     }
   ]
 }
 ```
 
-**权限：** 只有session.status='completed'才能查看
+**权限：**
+- 候选人：仅可查看自己的、且 `status='completed'` 的会话
+- 管理员：可查看任意会话（用于复核答案与解析）
 
 ---
 
-### 2.9 管理员：获取待评阅列表
+### 2.10 管理员：获取待评阅列表
 
-**端点：** `GET /api/admin/pending-essays`
+**端点：** `GET /api/admin/pending-grading`
 
 **权限：** `user.role === 'admin'`
 
 **响应：**
 ```typescript
 {
-  essays: [
+  pendingSessions: [
     {
-      answer_id: string,
-      session_id: string,
-      question: {
-        id: string,
-        content: string,
-        // ⚠️ 不返回correct_answer，返回reference_answer和explanation
-        reference_answer: string,
-        explanation: string // 评分rubric
-      },
-      user_answer: string,
-      user: {
-        email: string,
-        full_name: string
-      },
-      answered_at: string
+      sessionId: string,
+      userId: string,
+      userEmail: string,
+      userName: string | null,
+      completedAt: string | null,
+      answers: [
+        {
+          answerId: string,
+          questionId: string,
+          questionContent: string,
+          abilityDimension: 'architecture' | 'code_design' | 'database' | 'devops',
+          weight: number,
+          referenceAnswer: string | null,
+          explanation: string | null,
+          userAnswer: string,
+          answeredAt: string
+        }
+      ]
     }
-  ]
+  ],
+  totalCount: number
 }
 ```
 
 ---
 
-### 2.10 管理员：提交评分
+### 2.11 管理员：提交评分
 
-**端点：** `POST /api/admin/grade-essay`
+**端点：** `POST /api/admin/submit-score`
 
 **权限：** `user.role === 'admin'`
 
 **请求：**
 ```typescript
 {
-  answer_id: string,
-  manual_score: number, // 0-5
-  feedback?: string // 可选评语
+  answerId: string,
+  score: number,   // 0 ~ question.weight，支持0.5步进
+  sessionId: string
 }
 ```
 
 **响应：**
 ```typescript
 {
-  success: boolean
+  success: true,
+  newTotalScore: number,
+  newLevel: 'P5' | 'P6' | 'P7' | 'P8' | 'P9'
 }
 ```
 
 **业务逻辑：**
 1. 验证管理员权限
-2. 更新answers表：manual_score, graded_by, graded_at
-3. 重新计算该会话的总分（recalculateExamResult）
-4. 更新exam_results表
+2. 查询答案及对应题目，确认题目权重（最大分）
+3. 校验 `score` 在 `[0, weight]` 范围内（数据库 `manual_score` 类型为 `real`，支持小数）
+4. 更新 `answers`：`manual_score`、`graded_at`
+5. 调用 `calculateExamResult` 重新计算会话总分与职级
+
+---
+
+### 2.12 用户：获取个人资料
+
+**端点：** `GET /api/user/profile`
+
+**响应：**
+```typescript
+{
+  email: string,
+  fullName: string | null,
+  phone: string | null,
+  profileCompleted: boolean,
+  role: 'candidate' | 'admin'
+}
+```
+
+**业务逻辑：**
+1. 验证 Supabase 登录状态
+2. 读取 `users` 表中的用户记录
+3. 若记录不存在，返回空信息并视为 `profileCompleted=false`
+
+---
+
+### 2.13 用户：完善个人信息
+
+**端点：** `POST /api/user/complete-profile`
+
+**请求：**
+```typescript
+{
+  fullName: string, // ≥ 2 个字符
+  phone: string     // 大陆手机号格式，系统唯一
+}
+```
+
+**业务逻辑：**
+1. 验证 Supabase 登录状态
+2. 校验姓名/手机号格式
+3. 检查手机号是否已被其他用户绑定（数据库唯一约束）
+4. 若 `users` 记录不存在则创建；存在则更新，并置 `profile_completed=true`
+
+**错误码：**
+- `400` - 参数缺失/格式错误或手机号已被使用
+- `401` - 未登录
+- `500` - 服务器错误
 
 ---
 
@@ -521,7 +596,6 @@ export function sanitizeForGrading(question: Question) {
 | 401 | UNAUTHORIZED | 未登录或token失效 |
 | 403 | FORBIDDEN | 无权限访问 |
 | 404 | SESSION_NOT_FOUND | 会话不存在 |
-| 409 | SESSION_IN_PROGRESS | 已有进行中的考试 |
 | 409 | SESSION_COMPLETED | 考试已完成 |
 | 410 | SESSION_TERMINATED | 考试已终止（作弊） |
 | 429 | RATE_LIMIT_EXCEEDED | 请求过于频繁 |

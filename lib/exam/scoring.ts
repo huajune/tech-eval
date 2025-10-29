@@ -5,7 +5,7 @@ import {
   examSessionsTable,
   questionsTable,
 } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 /**
  * 职级映射
@@ -36,25 +36,34 @@ export async function calculateExamResult(sessionId: string) {
     }
 
     const session = sessions[0];
+    const selectedQuestionIds = session.selectedQuestions as string[];
 
-    // 2. 获取所有答案及对应题目
-    const answersWithQuestions = await db
-      .select({
-        answer: answersTable,
-        question: questionsTable,
-      })
-      .from(answersTable)
-      .innerJoin(
-        questionsTable,
-        eq(answersTable.questionId, questionsTable.id)
-      )
-      .where(eq(answersTable.sessionId, sessionId));
-
-    if (answersWithQuestions.length === 0) {
-      throw new Error("未找到答案记录");
+    if (!selectedQuestionIds || selectedQuestionIds.length === 0) {
+      throw new Error("会话中没有选定的题目");
     }
 
-    // 3. 按能力维度分组计算得分
+    // 2. 获取所有选定的题目（包括未作答的）
+    const questions = await db
+      .select()
+      .from(questionsTable)
+      .where(inArray(questionsTable.id, selectedQuestionIds));
+
+    if (questions.length === 0) {
+      throw new Error("未找到考试题目");
+    }
+
+    // 3. 获取所有答案记录（可能为空）
+    const answerRecords = await db
+      .select()
+      .from(answersTable)
+      .where(eq(answersTable.sessionId, sessionId));
+
+    // 创建答案映射表
+    const answerMap = new Map(
+      answerRecords.map((a) => [a.questionId, a])
+    );
+
+    // 4. 按能力维度分组计算得分（基于所有选定的题目）
     const abilityScores: Record<
       string,
       { score: number; total: number }
@@ -65,27 +74,36 @@ export async function calculateExamResult(sessionId: string) {
       devops: { score: 0, total: 0 },
     };
 
-    for (const { answer, question } of answersWithQuestions) {
+    for (const question of questions) {
       const dimension = question.abilityDimension;
       const weight = question.weight;
+      const answer = answerMap.get(question.id);
 
       if (!abilityScores[dimension]) {
         abilityScores[dimension] = { score: 0, total: 0 };
       }
 
-      // 选择题：使用is_correct字段
+      // 选择题
       if (question.type !== "essay") {
-        if (answer.isCorrect === true) {
+        // 总分累加（无论是否作答）
+        abilityScores[dimension].total += weight;
+
+        // 只有答对才加分
+        if (answer && answer.isCorrect === true) {
           abilityScores[dimension].score += weight;
         }
-        abilityScores[dimension].total += weight;
+        // 未作答或答错：不加分（已在total中计入）
       } else {
-        // 简答题：只有已人工评分时才计入总分
-        if (answer.manualScore !== null) {
+        // 简答题：总是计入总分分母
+        // 使用题目的实际权重（通常为5，但允许变化）
+        abilityScores[dimension].total += weight;
+
+        // 已人工评分：加上评分
+        // 注意：manualScore是0-weight的分数，不是百分比
+        if (answer && answer.manualScore !== null) {
           abilityScores[dimension].score += answer.manualScore;
-          abilityScores[dimension].total += 5; // 简答题满分5分
         }
-        // manualScore为null时跳过，既不计入分子也不计入分母
+        // 未评分或未作答：计0分（已在total中计入）
       }
     }
 

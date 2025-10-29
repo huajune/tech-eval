@@ -57,8 +57,9 @@ export async function GET(
 
     const { session, exam } = sessions[0];
 
-    // 4. Verify ownership
-    if (session.userId !== dbUser.id) {
+    // 4. Verify ownership or admin access
+    // Admin可以查看所有人的结果，candidate只能查看自己的
+    if (dbUser.role !== "admin" && session.userId !== dbUser.id) {
       return NextResponse.json({ error: "无权访问此结果" }, { status: 403 });
     }
 
@@ -93,6 +94,22 @@ export async function GET(
       (endTime.getTime() - startTime.getTime()) / 60000
     );
 
+    // Candidate只能看到基本信息，不能看到分数和评级
+    if (dbUser.role === "candidate") {
+      return NextResponse.json(
+        {
+          sessionId: session.id,
+          examName: exam.name,
+          completedAt: result.completedAt,
+          timeTakenMinutes,
+          userRole: dbUser.role,
+          // 不返回：totalScore, abilityScores, estimatedLevel, passStatus
+        },
+        { status: 200 }
+      );
+    }
+
+    // Admin可以看到完整信息
     return NextResponse.json(
       {
         sessionId: session.id,
@@ -103,6 +120,7 @@ export async function GET(
         passStatus: result.passStatus,
         completedAt: result.completedAt,
         timeTakenMinutes,
+        userRole: dbUser.role,
       },
       { status: 200 }
     );

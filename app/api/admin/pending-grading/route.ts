@@ -82,6 +82,7 @@ export async function GET() {
         referenceAnswer: string | null;
         explanation: string | null;
         abilityDimension: string;
+        weight: number; // 题目权重（满分）
       }>;
     }
 
@@ -107,6 +108,7 @@ export async function GET() {
           referenceAnswer: record.question.referenceAnswer,
           explanation: record.question.explanation,
           abilityDimension: record.question.abilityDimension,
+          weight: record.question.weight, // 添加权重字段
         });
 
         return acc;

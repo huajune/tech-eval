@@ -1,109 +1,288 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# TechEval - 技术能力评估系统
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+全面评估应聘者的技术能力，包括代码设计、软件架构、数据库建模和运维能力等多个维度。
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+## ✨ 功能特性
 
-## Features
+### 候选人功能
+- 🔐 **用户认证**：基于 Supabase Auth 的安全登录注册
+- 📝 **在线考试**：10分钟限时考试，20道题目（18道选择题 + 2道简答题）
+- 🎯 **技术栈选择**：支持前端/后端/全栈岗位，TypeScript/Java/Python语言
+- ⏱️ **倒计时功能**：实时显示剩余时间，自动提交
+- 🚫 **防作弊检测**：页面失焦、标签切换、复制粘贴监控
+- 📊 **考试结果**：查看答题详情和解析（分数对候选人不可见）
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+### 管理员功能
+- ✍️ **简答题评分**：人工评分简答题，支持小数分（如4.5分）
+- 📈 **成绩查看**：查看所有候选人的完整成绩和能力评级
+- 🔍 **答案详情**：查看候选人的所有答题记录和解析
+- 📋 **待评分管理**：集中管理所有待评分的简答题
 
-## Demo
+### 系统特性
+- ♻️ **多次考试**：支持同一用户多次参加考试，记录所有历史成绩
+- 💾 **会话恢复**：考试中刷新页面可恢复进度（限时内）
+- 🎨 **暗黑模式**：支持亮色/暗色主题切换
+- 📱 **响应式设计**：适配各种屏幕尺寸
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+## 🛠️ 技术栈
 
-## Deploy to Vercel
+- **框架**: [Next.js 15](https://nextjs.org/) (App Router)
+- **语言**: TypeScript
+- **UI 组件**: [shadcn/ui](https://ui.shadcn.com/)
+- **样式**: Tailwind CSS
+- **认证**: [Supabase Auth](https://supabase.com/docs/guides/auth)
+- **数据库**: PostgreSQL (via Supabase)
+- **ORM**: [Drizzle ORM](https://orm.drizzle.team/)
+- **部署**: Vercel (推荐)
 
-Vercel deployment will guide you through creating a Supabase account and project.
+## 📦 快速开始
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+### 前置要求
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+- Node.js 18+
+- pnpm (推荐) / npm / yarn
+- Supabase 账号
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+### 1. 克隆项目
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+```bash
+git clone <your-repo-url>
+cd with-supabase-app
+```
 
-## Clone and run locally
+### 2. 安装依赖
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+```bash
+pnpm install
+```
 
-2. Create a Next.js app using the Supabase Starter template npx command
+### 3. 配置环境变量
 
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
+复制 `.env.example` 为 `.env.local` 并填入以下信息：
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
+```env
+# Supabase 配置
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
 
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
+# 数据库连接 (用于 Drizzle)
+DATABASE_URL=postgresql://user:password@host:port/database?pgbouncer=true&connection_limit=1
+```
 
-3. Use `cd` to change into the app's directory
+> 💡 提示：
+> - 在 [Supabase Dashboard](https://supabase.com/dashboard) 创建项目
+> - API 设置页面获取 URL 和 Key
+> - 数据库设置页面获取连接字符串（建议使用 Session mode）
 
-   ```bash
-   cd with-supabase-app
-   ```
+### 4. 初始化数据库
 
-4. Rename `.env.example` to `.env.local` and update the following:
+```bash
+# 生成迁移文件（如果有schema变更）
+pnpm db:generate
 
-  ```env
-  NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=[INSERT SUPABASE PROJECT API PUBLISHABLE OR ANON KEY]
-  ```
-  > [!NOTE]
-  > This example uses `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, which refers to Supabase's new **publishable** key format.
-  > Both legacy **anon** keys and new **publishable** keys can be used with this variable name during the transition period. Supabase's dashboard may show `NEXT_PUBLIC_SUPABASE_ANON_KEY`; its value can be used in this example.
-  > See the [full announcement](https://github.com/orgs/supabase/discussions/29260) for more information.
+# 应用数据库迁移
+pnpm db:migrate
 
-  Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
+# （可选）打开 Drizzle Studio 查看数据
+pnpm db:studio
+```
 
-5. You can now run the Next.js local development server:
+### 5. 创建管理员账号
 
-   ```bash
-   npm run dev
-   ```
+数据库迁移后，需要手动设置管理员：
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+```sql
+-- 在 Supabase SQL Editor 中执行
+UPDATE users
+SET role = 'admin', profile_completed = true
+WHERE email = 'admin@example.com';
+```
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+### 6. 启动开发服务器
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+```bash
+pnpm dev
+```
 
-## Feedback and issues
+访问 [http://localhost:3000](http://localhost:3000) 查看应用。
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+## 📂 项目结构
 
-## More Supabase examples
+```
+├── app/                      # Next.js App Router
+│   ├── api/                  # API Routes
+│   │   ├── admin/           # 管理员API
+│   │   ├── exam/            # 考试相关API
+│   │   └── user/            # 用户相关API
+│   ├── admin/               # 管理员页面
+│   ├── auth/                # 认证页面
+│   ├── exam/                # 考试页面
+│   └── page.tsx             # 首页
+├── components/              # React组件
+│   └── ui/                  # shadcn/ui组件
+├── db/                      # 数据库
+│   ├── index.ts             # Drizzle实例
+│   └── schema.ts            # 数据库Schema
+├── drizzle/                 # 数据库迁移文件
+├── lib/                     # 工具函数
+│   ├── exam/                # 考试相关逻辑
+│   └── supabase/            # Supabase客户端
+└── CLAUDE.md                # AI开发指南
+```
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+## 🗄️ 数据库设计
+
+### 核心表结构
+
+- **users** - 用户表（关联 Supabase Auth）
+- **exams** - 考试模板表
+- **questions** - 题库表
+- **exam_sessions** - 考试会话表
+- **answers** - 答案记录表
+- **exam_results** - 考试结果表
+- **cheating_logs** - 作弊日志表
+
+### 关系图
+
+```
+User (1) ──→ (N) ExamSession (1) ──→ (1) ExamResult
+                    │
+                    └──→ (N) Answer
+                    └──→ (N) CheatingLog
+
+Exam (1) ──→ (N) ExamSession
+
+Question (1) ──→ (N) Answer
+```
+
+详细Schema定义见 `db/schema.ts`
+
+## 🔧 开发命令
+
+```bash
+# 开发
+pnpm dev              # 启动开发服务器（使用 Turbopack）
+pnpm build            # 构建生产版本
+pnpm start            # 启动生产服务器
+pnpm lint             # 运行 ESLint（添加 --fix 自动修复）
+
+# 数据库
+pnpm db:generate      # 生成迁移文件
+pnpm db:migrate       # 应用迁移
+pnpm db:push          # 直接推送schema（仅开发环境）
+pnpm db:studio        # 打开 Drizzle Studio
+```
+
+## 🎯 核心业务流程
+
+### 候选人考试流程
+
+1. 注册/登录账号
+2. 填写姓名和手机号
+3. 选择应聘岗位、编程语言和框架
+4. 开始10分钟限时考试
+5. 提交考试（自动或手动）
+6. 等待管理员评分简答题
+7. 查看答题详情和解析
+
+### 管理员评分流程
+
+1. 登录管理员账号
+2. 访问"待评分管理"页面
+3. 查看候选人简答题答案
+4. 根据参考答案和评分标准打分
+5. 提交评分，系统自动计算总分和能力评级
+6. 在"考试结果查看"页面查看所有成绩
+
+## 📊 评分规则
+
+### 选择题（自动评分）
+- 单选题/多选题：答对得1分，答错得0分
+
+### 简答题（人工评分）
+- 权重：通常为5分（可配置）
+- 评分范围：0 到题目权重（支持小数，如4.5）
+- 评分维度：代码设计、架构、数据库、运维
+
+### 总分计算
+```
+总分 = (各维度得分 / 各维度总分) * 100
+```
+
+### 能力评级
+- P5: 60-69分
+- P6: 70-79分
+- P7: 80-89分
+- P8: 90-95分
+- P9: 96-100分
+
+## 🔐 角色权限
+
+### Candidate（候选人）
+- ✅ 参加考试
+- ✅ 查看答题详情
+- ❌ 查看分数和评级
+- ❌ 查看其他人的成绩
+
+### Admin（管理员）
+- ✅ 查看所有候选人的完整成绩
+- ✅ 评分简答题
+- ✅ 查看所有考试详情
+- ❌ 参加考试
+
+## 🚀 部署
+
+### Vercel 部署（推荐）
+
+1. 推送代码到 GitHub
+2. 在 [Vercel](https://vercel.com) 导入项目
+3. 配置环境变量（同 `.env.local`）
+4. 部署完成
+
+### 环境变量
+
+确保在 Vercel 项目设置中添加：
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `DATABASE_URL`
+
+## 🧪 题库管理
+
+题目定义在代码中（未来可迁移到数据库）：
+
+```typescript
+// lib/exam/question-bank.ts
+export const questionBank: Question[] = [
+  {
+    id: "...",
+    content: "题目内容",
+    type: "single" | "multiple" | "essay",
+    options: { A: "...", B: "...", C: "...", D: "..." },
+    correctAnswer: ["A"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    // ...
+  }
+];
+```
+
+## 📝 待办事项
+
+- [ ] 添加题库管理后台
+- [ ] 导出考试成绩为Excel
+- [ ] 考试统计和数据可视化
+- [ ] 邮件通知功能
+- [ ] 考试时间灵活配置
+
+## 📄 许可证
+
+MIT
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+---
+
+Built with ❤️ using Next.js and Supabase

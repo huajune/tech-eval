@@ -1,0 +1,1 @@
+ALTER TABLE "answers" ALTER COLUMN "manual_score" SET DATA TYPE real;

@@ -3,6 +3,7 @@ import {
   integer,
   jsonb,
   pgTable,
+  real,
   text,
   timestamp,
   uuid,
@@ -16,8 +17,13 @@ export const usersTable = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   authUserId: uuid("auth_user_id").notNull().unique(),
   email: varchar("email", { length: 255 }).notNull(),
+  // 应聘者必填字段，首次登录后收集
+  // 注意：admin角色可以为空，所以数据库层不设置NOT NULL
+  // 业务逻辑层通过profileCompleted标志和role判断
   fullName: varchar("full_name", { length: 255 }),
+  phone: varchar("phone", { length: 20 }).unique(), // 唯一约束，防止重复
   role: varchar("role", { length: 50 }).default("candidate").notNull(), // 'candidate' | 'admin'
+  profileCompleted: boolean("profile_completed").default(false).notNull(), // 是否完成个人信息填写
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -96,7 +102,7 @@ export const answersTable = pgTable("answers", {
     .references(() => questionsTable.id, { onDelete: "cascade" }),
   userAnswer: jsonb("user_answer"), // ['A'] 或 ['A', 'C'] 或 "essay text"
   isCorrect: boolean("is_correct"), // 选择题自动判定，陈述题为null
-  manualScore: integer("manual_score"), // 陈述题人工评分 0-5
+  manualScore: real("manual_score"), // 陈述题人工评分 0-weight（支持小数，如4.5）
   gradedBy: uuid("graded_by"), // 评阅人ID（管理员）
   gradedAt: timestamp("graded_at"), // 评阅时间
   answeredAt: timestamp("answered_at").defaultNow().notNull(),

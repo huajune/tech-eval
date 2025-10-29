@@ -17,17 +17,20 @@ import Link from "next/link";
 interface ExamResult {
   sessionId: string;
   examName: string;
-  totalScore: number;
-  abilityScores: {
+  // 以下字段仅admin可见
+  totalScore?: number;
+  abilityScores?: {
     code_design: number;
     architecture: number;
     database: number;
     devops: number;
   };
-  estimatedLevel: string;
-  passStatus: boolean;
+  estimatedLevel?: string;
+  passStatus?: boolean;
+  // 所有角色可见
   completedAt: string;
   timeTakenMinutes: number;
+  userRole: string; // 'candidate' | 'admin'
 }
 
 const abilityLabels: Record<string, string> = {
@@ -112,39 +115,79 @@ export default function ExamResultPage() {
     return "bg-red-500";
   };
 
+  // Candidate角色：隐藏分数和评级
+  const isCandidate = result.userRole === "candidate";
+
   return (
     <div className="container mx-auto py-8 max-w-4xl">
       <div className="space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">考试结果报告</h1>
+          <h1 className="text-3xl font-bold">
+            {isCandidate ? "考试提交成功" : "考试结果报告"}
+          </h1>
           <p className="text-muted-foreground">{result.examName}</p>
         </div>
 
-        {/* Overall result card */}
-        <Card>
-          <CardHeader className="text-center pb-4">
-            <CardTitle className="text-xl mb-2">综合评估</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Pass/Fail status */}
-            <div className="text-center">
-              {result.passStatus ? (
-                <div className="inline-flex items-center gap-2 px-6 py-3 bg-green-50 border-2 border-green-300 rounded-lg">
-                  <span className="text-3xl">✅</span>
-                  <span className="text-xl font-bold text-green-700">
-                    通过考试
+        {isCandidate ? (
+          /* Candidate view - 隐藏分数 */
+          <Card>
+            <CardHeader className="text-center pb-4">
+              <CardTitle className="text-xl mb-2">考试已完成</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="text-center space-y-4">
+                <div className="inline-flex items-center gap-2 px-6 py-3 bg-blue-50 border-2 border-blue-300 rounded-lg">
+                  <span className="text-3xl">📋</span>
+                  <span className="text-xl font-bold text-blue-700">
+                    等待评分中
                   </span>
                 </div>
-              ) : (
-                <div className="inline-flex items-center gap-2 px-6 py-3 bg-red-50 border-2 border-red-300 rounded-lg">
-                  <span className="text-3xl">❌</span>
-                  <span className="text-xl font-bold text-red-700">
-                    未通过考试
-                  </span>
+                <div className="space-y-2">
+                  <p className="text-base text-muted-foreground">
+                    您的考试已成功提交，感谢参与！
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    考试结果将由管理员审核后公布，请耐心等待通知。
+                  </p>
+                  <div className="pt-4 border-t">
+                    <p className="text-sm text-muted-foreground">
+                      提交时间：{new Date(result.completedAt).toLocaleString("zh-CN")}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      用时：{result.timeTakenMinutes} 分钟
+                    </p>
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          /* Admin view - 显示完整分数 */
+          <>
+            <Card>
+              <CardHeader className="text-center pb-4">
+                <CardTitle className="text-xl mb-2">综合评估</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Pass/Fail status */}
+                <div className="text-center">
+                  {result.passStatus ? (
+                    <div className="inline-flex items-center gap-2 px-6 py-3 bg-green-50 border-2 border-green-300 rounded-lg">
+                      <span className="text-3xl">✅</span>
+                      <span className="text-xl font-bold text-green-700">
+                        通过考试
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center gap-2 px-6 py-3 bg-red-50 border-2 border-red-300 rounded-lg">
+                      <span className="text-3xl">❌</span>
+                      <span className="text-xl font-bold text-red-700">
+                        未通过考试
+                      </span>
+                    </div>
+                  )}
+                </div>
 
             {/* Total score */}
             <div className="text-center space-y-2">
@@ -152,7 +195,7 @@ export default function ExamResultPage() {
               <p
                 className={cn(
                   "text-6xl font-bold",
-                  getScoreColor(result.totalScore)
+                  getScoreColor(result.totalScore ?? 0)
                 )}
               >
                 {result.totalScore}
@@ -166,7 +209,7 @@ export default function ExamResultPage() {
               <div className="flex justify-center">
                 <Badge
                   className={cn(
-                    levelColors[result.estimatedLevel],
+                    levelColors[result.estimatedLevel ?? "P5"],
                     "text-white text-2xl px-6 py-2"
                   )}
                 >
@@ -174,7 +217,7 @@ export default function ExamResultPage() {
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground">
-                {levelDescriptions[result.estimatedLevel]}
+                {levelDescriptions[result.estimatedLevel ?? "P5"]}
               </p>
             </div>
 
@@ -188,75 +231,81 @@ export default function ExamResultPage() {
           </CardContent>
         </Card>
 
-        {/* Ability scores breakdown */}
-        <Card>
-          <CardHeader>
-            <CardTitle>能力维度评分</CardTitle>
-            <CardDescription>各项技术能力的详细得分</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {Object.entries(result.abilityScores).map(([key, score]) => (
-              <div key={key} className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">{abilityLabels[key]}</span>
-                  <span
-                    className={cn("text-xl font-bold", getScoreColor(score))}
-                  >
-                    {score}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                  <div
-                    className={cn(
-                      "h-full rounded-full transition-all duration-500",
-                      getScoreBarColor(score)
-                    )}
-                    style={{ width: `${score}%` }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+            {/* Ability scores breakdown */}
+            {result.abilityScores && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>能力维度评分</CardTitle>
+                  <CardDescription>各项技术能力的详细得分</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {Object.entries(result.abilityScores).map(([key, score]) => (
+                    <div key={key} className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">{abilityLabels[key]}</span>
+                        <span
+                          className={cn("text-xl font-bold", getScoreColor(score))}
+                        >
+                          {score}
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                        <div
+                          className={cn(
+                            "h-full rounded-full transition-all duration-500",
+                            getScoreBarColor(score)
+                          )}
+                          style={{ width: `${score}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
 
-        {/* Score interpretation */}
-        <Card>
-          <CardHeader>
-            <CardTitle>评分说明</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="font-semibold mb-1">职级对应分数:</p>
-                <ul className="space-y-1 text-muted-foreground">
-                  <li>• P9: 91-100 分</li>
-                  <li>• P8: 76-90 分</li>
-                  <li>• P7: 61-75 分</li>
-                  <li>• P6: 41-60 分</li>
-                  <li>• P5: 0-40 分</li>
-                </ul>
-              </div>
-              <div>
-                <p className="font-semibold mb-1">能力维度权重:</p>
-                <ul className="space-y-1 text-muted-foreground">
-                  <li>• 软件架构: 30%</li>
-                  <li>• 代码设计: 25%</li>
-                  <li>• 数据库建模: 25%</li>
-                  <li>• 运维能力: 20%</li>
-                </ul>
-              </div>
-            </div>
-            <p className="text-muted-foreground pt-2 border-t">
-              注意：简答题需要人工评分，评分完成后总分可能会有调整。
-            </p>
-          </CardContent>
-        </Card>
+            {/* Score interpretation */}
+            <Card>
+              <CardHeader>
+                <CardTitle>评分说明</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="font-semibold mb-1">职级对应分数:</p>
+                    <ul className="space-y-1 text-muted-foreground">
+                      <li>• P9: 91-100 分</li>
+                      <li>• P8: 76-90 分</li>
+                      <li>• P7: 61-75 分</li>
+                      <li>• P6: 41-60 分</li>
+                      <li>• P5: 0-40 分</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="font-semibold mb-1">能力维度权重:</p>
+                    <ul className="space-y-1 text-muted-foreground">
+                      <li>• 软件架构: 30%</li>
+                      <li>• 代码设计: 25%</li>
+                      <li>• 数据库建模: 25%</li>
+                      <li>• 运维能力: 20%</li>
+                    </ul>
+                  </div>
+                </div>
+                <p className="text-muted-foreground pt-2 border-t">
+                  注意：简答题需要人工评分，评分完成后总分可能会有调整。
+                </p>
+              </CardContent>
+            </Card>
+          </>
+        )}
 
         {/* Action buttons */}
         <div className="flex justify-center gap-4">
-          <Button asChild variant="outline" size="lg">
-            <Link href={`/exam/${sessionId}/answers`}>查看答案解析</Link>
-          </Button>
+          {!isCandidate && (
+            <Button asChild variant="outline" size="lg">
+              <Link href={`/exam/${sessionId}/answers`}>查看答案解析</Link>
+            </Button>
+          )}
           <Button asChild size="lg">
             <Link href="/">返回首页</Link>
           </Button>
