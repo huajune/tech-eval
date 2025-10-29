@@ -204,6 +204,74 @@ export const codeDesignQuestions = [
     applicableLanguages: ["typescript"],
     explanation: "闭包是指函数可以记住并访问其词法作用域，即使函数在其词法作用域之外执行。这是JavaScript的核心特性，合理使用不会导致内存泄漏。"
   },
+  {
+    content: "在Next.js中，以下哪种方式可以创建动态路由？",
+    type: "single",
+    options: {
+      A: "pages/post-[id].tsx",
+      B: "pages/post/[id].tsx",
+      C: "pages/post/:id.tsx",
+      D: "pages/post/{id}.tsx"
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: ["typescript"],
+    explanation: "Next.js使用文件系统路由，动态路由段用方括号表示，如[id].tsx。放在目录下可以访问/post/123这样的URL。"
+  },
+  {
+    content: "TypeScript中，以下哪种方式可以定义一个可选属性？",
+    type: "single",
+    options: {
+      A: "name: string | null",
+      B: "name?: string",
+      C: "name: string = ''",
+      D: "name: string | undefined"
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "backend", "fullstack"],
+    applicableLanguages: ["typescript"],
+    explanation: "问号(?)表示可选属性，相当于 name: string | undefined。与| null不同，可选属性可以完全不提供。"
+  },
+  {
+    content: "React中，useState的初始值如果是一个函数调用，会发生什么？",
+    type: "single",
+    options: {
+      A: "函数会在每次渲染时执行",
+      B: "函数只会在组件挂载时执行一次",
+      C: "会报错，useState不接受函数作为参数",
+      D: "函数会在组件更新时执行"
+    },
+    correctAnswer: ["A"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: ["typescript"],
+    explanation: "useState(expensiveFunc())会在每次渲染时调用函数。如果初始值计算昂贵，应该使用惰性初始化：useState(() => expensiveFunc())。"
+  },
+  {
+    content: "在React中，以下关于key属性的说法，哪个是正确的？",
+    type: "single",
+    options: {
+      A: "key只是为了方便调试，对性能没有影响",
+      B: "可以使用数组索引作为key，这是最佳实践",
+      C: "key帮助React识别哪些元素改变了，从而优化渲染",
+      D: "key必须是数字类型"
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: ["typescript"],
+    explanation: "key帮助React识别列表中元素的变化，避免不必要的重新渲染。使用索引作为key在列表项顺序改变时会导致问题，应该使用稳定的唯一标识。"
+  },
 
   // 中等题（8题）
   {
@@ -341,5 +409,124 @@ export const codeDesignQuestions = [
     applicableRoles: ["backend", "fullstack"],
     applicableLanguages: ["java"],
     explanation: "Optional.of()要求参数非空，ofNullable()可接受null。Optional不应用作类字段，主要用于方法返回值。orElse/orElseGet用于提供默认值，避免直接调用get()。"
+  },
+  {
+    content: "在Next.js中，你需要展示一个商品列表页面，数据每天更新一次。以下哪种数据获取方式最合适？",
+    type: "single",
+    options: {
+      A: "getServerSideProps - 每次请求都获取最新数据",
+      B: "getStaticProps with revalidate - 增量静态生成",
+      C: "useEffect客户端请求 - 在浏览器中获取数据",
+      D: "getStaticProps without revalidate - 构建时生成"
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: ["typescript"],
+    explanation: "数据每天更新一次，使用ISR(Incremental Static Regeneration)最合适，设置revalidate为86400秒。既保证了性能（静态页面），又能定期更新数据。SSR每次都请求浪费资源，纯静态无法更新，客户端请求SEO不友好。"
+  },
+  {
+    content: "以下关于React性能优化的说法，哪些是正确的？（多选）",
+    type: "multiple",
+    options: {
+      A: "useMemo用于缓存计算结果，避免重复计算",
+      B: "useCallback用于缓存函数引用，避免子组件不必要的渲染",
+      C: "应该给所有组件都包裹React.memo",
+      D: "使用React.lazy和Suspense可以实现代码分割"
+    },
+    correctAnswer: ["A", "B", "D"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: ["typescript"],
+    explanation: "useMemo缓存计算结果，useCallback缓存函数引用，React.lazy实现懒加载。但不应该过度优化，给所有组件包裹memo会增加额外开销，应该针对性优化重渲染昂贵的组件。"
+  },
+  {
+    content: "TypeScript中，以下哪些工具类型的使用是正确的？（多选）",
+    type: "multiple",
+    options: {
+      A: "Partial<User>可以将User的所有属性变为可选",
+      B: "Pick<User, 'id' | 'name'>可以选择User的部分属性创建新类型",
+      C: "Omit<User, 'password'>可以排除User的password属性",
+      D: "Required<User>可以将User的所有可选属性变为必选"
+    },
+    correctAnswer: ["A", "B", "C", "D"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["frontend", "backend", "fullstack"],
+    applicableLanguages: ["typescript"],
+    explanation: "所有选项都是TypeScript内置工具类型的正确用法。Partial使所有属性可选，Pick选择指定属性，Omit排除指定属性，Required使所有属性必选。"
+  },
+  {
+    content: "在React中，你有一个深层嵌套的组件树，多个子组件需要访问用户信息。以下哪种方式最合适？",
+    type: "single",
+    options: {
+      A: "通过props一层层传递下去",
+      B: "使用Context API共享数据",
+      C: "使用全局变量存储",
+      D: "每个组件独立请求用户信息"
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: ["typescript"],
+    explanation: "Context API专为解决props drilling（逐层传递）问题设计，适合共享全局数据如用户信息、主题、语言等。全局变量不响应式，独立请求浪费资源，props逐层传递维护困难。"
+  },
+  {
+    content: "以下关于TypeScript的类型推导，哪些说法是正确的？（多选）",
+    type: "multiple",
+    options: {
+      A: "const声明的原始类型变量会被推导为字面量类型",
+      B: "let声明的变量会被推导为更宽泛的类型",
+      C: "函数返回值类型通常可以自动推导",
+      D: "应该给所有变量都显式声明类型"
+    },
+    correctAnswer: ["A", "B", "C"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["frontend", "backend", "fullstack"],
+    applicableLanguages: ["typescript"],
+    explanation: "const x = 'hello'推导为'hello'字面量类型，let x = 'hello'推导为string。函数返回值通常能正确推导。但不需要给所有变量显式声明类型，过度标注反而降低可读性，应该利用类型推导。"
+  },
+  {
+    content: "你在开发一个自定义Hook用于获取API数据，需要处理加载、错误、数据三种状态。以下哪种设计最合理？",
+    type: "single",
+    options: {
+      A: "返回三个独立的state：[data, isLoading, error]",
+      B: "返回一个对象：{ data, isLoading, error, refetch }",
+      C: "只返回data，把loading和error存在全局state",
+      D: "使用throw抛出错误，不返回error状态"
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: ["typescript"],
+    explanation: "返回对象形式最灵活，支持解构和重命名。还可以包含refetch等额外方法。数组形式对于多个同类hook使用不便，全局状态管理过度，抛出错误破坏了声明式编程。"
+  },
+  {
+    content: "关于Next.js的Image组件，以下哪些说法是正确的？（多选）",
+    type: "multiple",
+    options: {
+      A: "自动优化图片大小和格式（如WebP）",
+      B: "支持懒加载，提升页面性能",
+      C: "必须指定width和height属性",
+      D: "可以使用placeholder属性显示模糊占位图"
+    },
+    correctAnswer: ["A", "B", "D"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: ["typescript"],
+    explanation: "Next.js Image组件自动优化图片、支持懒加载和模糊占位图。width和height不是必须的，使用fill布局时可以不指定，但指定尺寸可以避免布局偏移(CLS)。"
   }
 ];

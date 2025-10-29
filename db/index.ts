@@ -21,6 +21,10 @@ if (!process.env.DATABASE_URL) {
 // If using Supabase transaction pooling, uncomment the prepare: false option
 const client = postgres(process.env.DATABASE_URL, {
   // prepare: false, // Uncomment for Supabase transaction pooling
+  max: 10, // Maximum number of connections in the pool
+  idle_timeout: 20, // Close idle connections after 20 seconds
+  max_lifetime: 60 * 30, // Close connections after 30 minutes
+  connect_timeout: 10, // Connection timeout in seconds
 });
 
 // Create Drizzle instance with schema

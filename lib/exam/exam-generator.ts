@@ -55,9 +55,17 @@ const QUESTION_DISTRIBUTION = {
 
 /**
  * 从数组中随机选择n个元素
+ * 使用Fisher-Yates洗牌算法，保证真正的随机性和均匀分布
  */
 function selectRandom<T>(array: T[], count: number): T[] {
-  const shuffled = [...array].sort(() => Math.random() - 0.5);
+  const shuffled = [...array];
+
+  // Fisher-Yates (Knuth) shuffle algorithm
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
   return shuffled.slice(0, count);
 }
 
@@ -175,13 +183,23 @@ export async function generateExamQuestions(
       throw new Error(`题目数量错误：需要20题，实际生成${selected.length}题`);
     }
 
+    // 6. 验证题目ID唯一性（防止重复）
+    const uniqueIds = new Set(selected.map(q => q.id));
+    if (uniqueIds.size !== selected.length) {
+      throw new Error(`题目存在重复：生成${selected.length}题，但只有${uniqueIds.size}个唯一ID`);
+    }
+
     const essayCount = selected.filter((q) => q.type === "essay").length;
     const choiceCount = selected.filter((q) => q.type !== "essay").length;
 
     console.log(`题目统计：总计${selected.length}题，选择题${choiceCount}题，简答题${essayCount}题`);
 
-    // 5. 随机打乱顺序
-    const shuffled = selected.sort(() => Math.random() - 0.5);
+    // 7. 随机打乱顺序（使用Fisher-Yates算法）
+    const shuffled = [...selected];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
 
     return shuffled;
   } catch (error) {
