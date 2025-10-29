@@ -1,5 +1,5 @@
 export const codeDesignQuestions = [
-  // 简单题（12题）
+  // 简单题（17题）
   {
     content: "在React函数组件中，以下哪种方式最符合处理副作用的最佳实践？",
     type: "single",
