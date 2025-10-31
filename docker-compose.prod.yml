@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  exam-system:
+    # 生产环境使用本地构建或上传的镜像
+    # 构建镜像命令：docker build -t exam-system:latest .
+    # 保存镜像命令：docker save exam-system:latest | gzip > exam-system.tar.gz
+    # 加载镜像命令：docker load < exam-system.tar.gz
+    image: exam-system:latest
+    container_name: exam-system
+    ports:
+      # 映射到宿主机的 3001 端口（避免与其他服务冲突）
+      # 格式：宿主机端口:容器端口
+      - "3001:3000"
+    environment:
+      # Supabase 配置（必需）
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+
+      # Supabase 服务端密钥（如果需要）
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+
+      # 数据库连接（Drizzle ORM 使用）
+      - DATABASE_URL=${DATABASE_URL}
+
+      # Node 环境
+      - NODE_ENV=production
+
+    # 可选：持久化日志
+    # volumes:
+    #   - ./logs:/app/logs
+
+    restart: always
+
+    # 网络性能优化配置
+    sysctls:
+      - net.core.somaxconn=1024
+      - net.ipv4.tcp_keepalive_time=600
+
+    # 资源限制（根据服务器配置调整）
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # 日志配置
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

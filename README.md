@@ -4,8 +4,8 @@
 
 ## ✨ 核心能力
 
-- 候选人：选择岗位与技术栈、进行限时考试、防作弊提醒、查看答题详情  
-- 管理员：集中查看成绩、人工评分简答题、复核候选人答题记录  
+- 候选人：选择岗位与技术栈、进行限时考试、防作弊提醒、查看答题详情
+- 管理员：集中查看成绩、人工评分简答题、复核候选人答题记录
 - 系统：多次考试记录、会话恢复、暗黑模式
 
 ## ⚡ 快速上手
@@ -68,6 +68,36 @@ pnpm db:migrate  # 应用迁移
 pnpm db:studio   # 浏览数据库
 ```
 
+## 🐳 Docker 部署
+
+本项目完整支持 Docker 容器化部署，适合部署到 Linux (Ubuntu) 服务器。
+
+### 快速部署
+
+```bash
+# 1. 本地构建镜像（自动化脚本）
+./build.sh
+
+# 2. 上传到服务器并部署
+# 详见 QUICK-START.md
+```
+
+### 部署文档
+
+- **[QUICK-START.md](./QUICK-START.md)** - 5 分钟快速部署指南 ⚡
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - 完整部署文档、运维命令和故障排查 📘
+
+### 部署相关文件
+
+| 文件                      | 说明                              |
+| ------------------------- | --------------------------------- |
+| `Dockerfile`              | Docker 镜像构建配置（多阶段构建） |
+| `docker-compose.prod.yml` | 生产环境容器编排配置              |
+| `.dockerignore`           | 构建时排除的文件列表              |
+| `nginx.conf.example`      | Nginx 反向代理配置示例            |
+| `build.sh`                | 本地构建脚本（自动化）            |
+| `deploy-server.sh`        | 服务器部署脚本（自动化）          |
+
 ## 📁 项目结构
 
 ```
@@ -78,7 +108,8 @@ pnpm db:studio   # 浏览数据库
 ├─ db/                   # Drizzle schema & client
 ├─ drizzle/              # 数据库迁移文件
 ├─ supabase/             # Supabase SQL 脚本
-└─ docs/                 # PRD、API 契约、数据库设计文档
+├─ docs/                 # PRD、API 契约、数据库设计文档
+└─ example/              # 参考配置示例
 ```
 
 ## 📚 相关资料
