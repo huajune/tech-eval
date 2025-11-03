@@ -50,6 +50,12 @@ next-env.d.ts
 Dockerfile
 docker-compose*.yml
 .dockerignore
+docker-images/
+
+# deployment scripts
+build.sh
+server-deploy.sh
+deploy-server.sh
 
 # docs
 docs/

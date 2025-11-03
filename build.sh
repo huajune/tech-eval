@@ -29,11 +29,11 @@ echo "📋 加载构建时需要的环境变量..."
 export $(grep -E '^NEXT_PUBLIC_' .env.local | xargs)
 
 # 验证必需的环境变量
-if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ] || [ -z "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then
+if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ] || [ -z "$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY" ]; then
     echo "❌ 错误：缺少必需的环境变量"
     echo "请确保 .env.local 中包含："
     echo "  - NEXT_PUBLIC_SUPABASE_URL"
-    echo "  - NEXT_PUBLIC_SUPABASE_ANON_KEY"
+    echo "  - NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
     exit 1
 fi
 
@@ -51,7 +51,7 @@ echo "📌 版本号: $VERSION"
 echo "📦 构建 Docker 镜像 (linux/amd64)..."
 docker build --platform linux/amd64 \
   --build-arg NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL \
-  --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY \
+  --build-arg NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY \
   -t exam-system:$VERSION \
   -t exam-system:latest \
   .
@@ -91,9 +91,18 @@ if [ -f "$OUTPUT_FILE" ]; then
 
     # 创建 latest 符号链接方便使用
     cd "$OUTPUT_DIR"
-    ln -sf "exam-system-${VERSION}.tar.gz" "exam-system-latest.tar.gz"
+
+    # 安全创建符号链接 - 先删除旧的再创建新的
+    if [ -L "exam-system-latest.tar.gz" ]; then
+        rm "exam-system-latest.tar.gz"
+    fi
+    ln -s "exam-system-${VERSION}.tar.gz" "exam-system-latest.tar.gz"
+
     if [ -f "exam-system-${VERSION}.md5" ]; then
-        ln -sf "exam-system-${VERSION}.md5" "exam-system-latest.md5"
+        if [ -L "exam-system-latest.md5" ]; then
+            rm "exam-system-latest.md5"
+        fi
+        ln -s "exam-system-${VERSION}.md5" "exam-system-latest.md5"
     fi
     cd - > /dev/null
 

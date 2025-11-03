@@ -40,3 +40,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# docker build artifacts
+/docker-images/
+*.tar.gz
+*.tar
+*.md5
+
+# deployment logs
+deploy-*.log

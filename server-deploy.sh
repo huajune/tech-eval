@@ -29,6 +29,25 @@ if [ ! -f "$IMAGE_FILE" ]; then
     exit 1
 fi
 
+# 检查可用磁盘空间
+echo "💾 检查磁盘空间..."
+REQUIRED_SPACE=2048  # MB
+DOCKER_DIR="/var/lib/docker"
+if [ -d "$DOCKER_DIR" ]; then
+    AVAILABLE_SPACE=$(df "$DOCKER_DIR" | awk 'NR==2 {print int($4/1024)}')
+else
+    AVAILABLE_SPACE=$(df / | awk 'NR==2 {print int($4/1024)}')
+fi
+
+if [ $AVAILABLE_SPACE -lt $REQUIRED_SPACE ]; then
+    echo -e "${RED}❌ 错误：磁盘空间不足${NC}"
+    echo "   需要: ${REQUIRED_SPACE}MB"
+    echo "   可用: ${AVAILABLE_SPACE}MB"
+    echo "   建议: 清理旧的 Docker 镜像或增加磁盘空间"
+    exit 1
+fi
+echo -e "${GREEN}✅ 磁盘空间充足 (可用: ${AVAILABLE_SPACE}MB)${NC}"
+
 # 检查 docker 是否安装
 if ! command -v docker &> /dev/null; then
     echo -e "${RED}❌ 错误：Docker 未安装${NC}"
@@ -36,12 +55,18 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-# 检查 docker-compose 是否安装
-if ! command -v docker-compose &> /dev/null; then
+# 检查 docker-compose 是否安装（支持新旧两种命令格式）
+DOCKER_COMPOSE_CMD=""
+if command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker-compose"
+elif docker compose version &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker compose"
+else
     echo -e "${RED}❌ 错误：Docker Compose 未安装${NC}"
     echo "请先安装 Docker Compose: https://docs.docker.com/compose/install/"
     exit 1
 fi
+echo "✅ 使用 Docker Compose 命令: $DOCKER_COMPOSE_CMD"
 
 # 检查 docker-compose.prod.yml 是否存在
 if [ ! -f "docker-compose.prod.yml" ]; then
@@ -55,7 +80,7 @@ if [ ! -f ".env" ]; then
     echo -e "${YELLOW}⚠️  警告：未找到 .env 文件${NC}"
     echo "请创建 .env 文件并配置以下环境变量："
     echo "  - NEXT_PUBLIC_SUPABASE_URL"
-    echo "  - NEXT_PUBLIC_SUPABASE_ANON_KEY"
+    echo "  - NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
     echo "  - SUPABASE_URL"
     echo "  - SUPABASE_SERVICE_ROLE_KEY"
     echo "  - DATABASE_URL"
@@ -88,7 +113,7 @@ fi
 # 1. 停止并删除旧容器（如果存在）
 if docker ps -a | grep -q exam-system; then
     echo "🛑 停止旧容器..."
-    docker-compose -f docker-compose.prod.yml down
+    $DOCKER_COMPOSE_CMD -f docker-compose.prod.yml down
 fi
 
 # 2. 加载新镜像
@@ -116,13 +141,14 @@ else
     exit 1
 fi
 
-# 3. 清理旧镜像（保留最新的）
+# 3. 清理 exam-system 旧镜像（保留 latest 标签）
 echo "🧹 清理旧镜像..."
-docker image prune -f
+# 只删除 exam-system 的 <none> 标签镜像
+docker images | grep exam-system | grep '<none>' | awk '{print $3}' | xargs -r docker rmi -f 2>/dev/null || true
 
 # 4. 启动新容器
 echo "🚀 启动容器..."
-docker-compose -f docker-compose.prod.yml up -d
+$DOCKER_COMPOSE_CMD -f docker-compose.prod.yml up -d
 
 # 5. 等待健康检查
 echo "⏳ 等待服务启动..."
@@ -131,22 +157,23 @@ sleep 10
 # 6. 检查容器状态
 if docker ps | grep -q exam-system; then
     echo -e "${GREEN}✅ 容器启动成功！${NC}"
-    
+
     # 显示容器信息
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "📊 容器状态："
-    docker-compose -f docker-compose.prod.yml ps
+    $DOCKER_COMPOSE_CMD -f docker-compose.prod.yml ps
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
-    
-    # 显示日志
-    echo "📋 最新日志（按 Ctrl+C 退出）："
-    docker-compose -f docker-compose.prod.yml logs --tail=20 -f
+
+    # 显示最新日志（不阻塞）
+    echo "📋 最新日志（最近 50 行）："
+    $DOCKER_COMPOSE_CMD -f docker-compose.prod.yml logs --tail=50
+    echo ""
 else
     echo -e "${RED}❌ 容器启动失败${NC}"
     echo "查看日志："
-    docker-compose -f docker-compose.prod.yml logs
+    $DOCKER_COMPOSE_CMD -f docker-compose.prod.yml logs
     exit 1
 fi
 
@@ -157,20 +184,20 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "📝 常用命令："
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "  查看日志:"
-echo "    docker-compose -f docker-compose.prod.yml logs -f"
+echo "  实时查看日志:"
+echo "    $DOCKER_COMPOSE_CMD -f docker-compose.prod.yml logs -f"
 echo ""
 echo "  查看状态:"
-echo "    docker-compose -f docker-compose.prod.yml ps"
+echo "    $DOCKER_COMPOSE_CMD -f docker-compose.prod.yml ps"
 echo ""
 echo "  重启服务:"
-echo "    docker-compose -f docker-compose.prod.yml restart"
+echo "    $DOCKER_COMPOSE_CMD -f docker-compose.prod.yml restart"
 echo ""
 echo "  停止服务:"
-echo "    docker-compose -f docker-compose.prod.yml stop"
+echo "    $DOCKER_COMPOSE_CMD -f docker-compose.prod.yml stop"
 echo ""
 echo "  停止并删除容器:"
-echo "    docker-compose -f docker-compose.prod.yml down"
+echo "    $DOCKER_COMPOSE_CMD -f docker-compose.prod.yml down"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
