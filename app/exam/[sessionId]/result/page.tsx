@@ -24,6 +24,7 @@ interface ExamResult {
     architecture: number;
     database: number;
     devops: number;
+    qa_testing: number;
   };
   estimatedLevel?: string;
   passStatus?: boolean;
@@ -38,6 +39,7 @@ const abilityLabels: Record<string, string> = {
   architecture: "软件架构",
   database: "数据库建模",
   devops: "运维能力",
+  qa_testing: "QA测试",
 };
 
 const levelColors: Record<string, string> = {
@@ -284,15 +286,16 @@ export default function ExamResultPage() {
                   <div>
                     <p className="font-semibold mb-1">能力维度权重:</p>
                     <ul className="space-y-1 text-muted-foreground">
-                      <li>• 软件架构: 30%</li>
-                      <li>• 代码设计: 25%</li>
-                      <li>• 数据库建模: 25%</li>
+                      <li>• 代码设计: 20%</li>
+                      <li>• 软件架构: 20%</li>
+                      <li>• 数据库建模: 20%</li>
                       <li>• 运维能力: 20%</li>
+                      <li>• QA测试: 20%</li>
                     </ul>
                   </div>
                 </div>
                 <p className="text-muted-foreground pt-2 border-t">
-                  注意：简答题需要人工评分，评分完成后总分可能会有调整。
+                  注意：如包含简答题需人工评分，评分完成后总分可能会有调整。
                 </p>
               </CardContent>
             </Card>
