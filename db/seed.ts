@@ -33,7 +33,7 @@ async function seed() {
         framework: "nextjs",
         durationMinutes: 10,
         passingScore: 60,
-        totalQuestions: 20,
+        totalQuestions: 25,
         isActive: true,
       },
       {
@@ -44,7 +44,7 @@ async function seed() {
         framework: "react",
         durationMinutes: 10,
         passingScore: 60,
-        totalQuestions: 20,
+        totalQuestions: 25,
         isActive: true,
       },
       {
@@ -55,7 +55,7 @@ async function seed() {
         framework: "spring",
         durationMinutes: 10,
         passingScore: 60,
-        totalQuestions: 20,
+        totalQuestions: 25,
         isActive: true,
       },
       {
@@ -66,7 +66,7 @@ async function seed() {
         framework: "django",
         durationMinutes: 10,
         passingScore: 60,
-        totalQuestions: 20,
+        totalQuestions: 25,
         isActive: true,
       },
       {
@@ -77,7 +77,7 @@ async function seed() {
         framework: "express",
         durationMinutes: 10,
         passingScore: 60,
-        totalQuestions: 20,
+        totalQuestions: 25,
         isActive: true,
       },
       {
@@ -88,7 +88,7 @@ async function seed() {
         framework: "nextjs",
         durationMinutes: 10,
         passingScore: 60,
-        totalQuestions: 20,
+        totalQuestions: 25,
         isActive: true,
       },
     ];
