@@ -1,4 +1,6 @@
-export const codeDesignQuestions = [
+import { SeedQuestion } from "./types";
+
+export const codeDesignQuestions: SeedQuestion[] = [
   // 简单题（22题）
   {
     content: "在React函数组件中，以下哪种方式最符合处理副作用的最佳实践？",
@@ -613,5 +615,434 @@ export const codeDesignQuestions = [
     applicableRoles: ["frontend", "fullstack"],
     applicableLanguages: ["typescript"],
     explanation: "Next.js Image组件自动优化图片、支持懒加载和模糊占位图。width和height不是必须的，使用fill布局时可以不指定，但指定尺寸可以避免布局偏移(CLS)。"
+  },
+
+  // 新增：Java后端开发题目
+  {
+    content: "Java 中 String s = new String (\"xyz\"); 创建了几个对象？",
+    type: "single",
+    options: {
+      A: "1 个",
+      B: "2 个 (如果常量池中没有 \"xyz\")",
+      C: "3 个",
+      D: "0 个"
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend", "fullstack"],
+    applicableLanguages: ["java"],
+    explanation: "一个是常量池中的 \"xyz\"，一个是堆中的 String 对象。"
+  },
+  {
+    content: "需要存储键值对，且要求按插入顺序遍历，应选择哪个集合？",
+    type: "single",
+    options: {
+      A: "HashMap",
+      B: "TreeMap",
+      C: "LinkedHashMap",
+      D: "Hashtable"
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend", "fullstack"],
+    applicableLanguages: ["java"],
+    explanation: "LinkedHashMap 维护了插入顺序，HashMap 无序，TreeMap 按 Key 排序。"
+  },
+  {
+    content: "线程池 ThreadPoolExecutor 的核心参数中，maximumPoolSize 是指？",
+    type: "single",
+    options: {
+      A: "核心线程数",
+      B: "任务队列的容量",
+      C: "线程池允许创建的最大线程数",
+      D: "线程空闲存活时间"
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["backend", "fullstack"],
+    applicableLanguages: ["java"],
+    explanation: "maximumPoolSize 是线程池中允许的最大线程数，当队列满了且线程数小于该值时会创建新线程。"
+  },
+  {
+    content: "客户端请求接口收到 HTTP 403 Forbidden 状态码，通常意味着？",
+    type: "single",
+    options: {
+      A: "接口地址写错了",
+      B: "服务器内部报错",
+      C: "认证通过，但没有权限访问该资源",
+      D: "请求参数格式错误"
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "backend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "403 Forbidden 表示服务器理解请求但拒绝执行，通常是因为权限不足。"
+  },
+  {
+    content: "线上出现 Bug，日志显示是 NullPointerException，但定位的代码行看起来不可能为空，你首先怀疑？",
+    type: "single",
+    options: {
+      A: "JVM 出问题了",
+      B: "线上运行的代码版本和本地看到的代码版本不一致",
+      C: "也是没办法，重启试试",
+      D: "编译器优化的锅"
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["backend", "fullstack"],
+    applicableLanguages: ["java"],
+    explanation: "代码版本不一致是导致看似不可能的空指针异常的常见原因。"
+  },
+  {
+    content: "需求评审会上，你发现产品经理的一个需求逻辑上有死循环风险，你应该？",
+    type: "single",
+    options: {
+      A: "会后私下告诉开发组长",
+      B: "当场提出，并用具体数据或场景演示这个死循环是如何发生的",
+      C: "不说话，等开发的时候再问",
+      D: "觉得产品经理不专业，心里嘲笑他"
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "backend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "及时、专业地指出风险并提供证据是高效协作的体现。"
+  },
+  {
+    content: "测试在群里说你的接口报错了，但你自测是好的，你最好的回复是？",
+    type: "single",
+    options: {
+      A: "我这里好的，你检查下你的环境。",
+      B: "报错截图发我看下，还有入参是什么？",
+      C: "不可能，我测过好几遍了。",
+      D: "不回复，默默去查日志。"
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "backend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "索要具体信息（截图、入参）是解决问题的有效第一步，体现了解决问题的态度。"
+  },
+  {
+    content: "周五临下班，领导突然塞给你一个紧急但不难的任务，需要 2 小时，你会？",
+    type: "single",
+    options: {
+      A: "直接拒绝，说下周一做。",
+      B: "默默做完，心里很不爽。",
+      C: "快速评估影响，确认必须今天做后，告知领导进度，做完再走，并申请调休或记录工时。",
+      D: "随便做做应付一下。"
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "backend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "专业地评估、沟通并执行，同时维护自己的权益。"
+  },
+  {
+    content: "接手一个没有任何文档的老旧项目，代码非常乱，你需要修改一个功能，最高效的切入点是？",
+    type: "single",
+    options: {
+      A: "通读所有代码",
+      B: "找到该功能的入口接口，通过日志或断点，通过一条完整的请求链路来梳理逻辑",
+      C: "找以前的离职员工问",
+      D: "拒绝修改"
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["frontend", "backend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "通过入口追踪请求链路是理解遗留代码最直接有效的方法。"
+  },
+  {
+    content: "两个线程同时执行 i++ (i 初始为 0) 各 100 次，最终 i 的结果可能是？",
+    type: "single",
+    options: {
+      A: "一定是 200",
+      B: "一定小于 200",
+      C: "可能是 200，也可能小于 200",
+      D: "报错"
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend", "fullstack"],
+    applicableLanguages: ["java"],
+    explanation: "i++ 不是原子操作，多线程并发下可能出现覆盖写入，导致结果小于 200，但也可能运气好正好是 200。"
+  },
+  {
+    content: "系统频繁发生 Full GC，导致系统卡顿，以下哪个原因 最不可能？",
+    type: "single",
+    options: {
+      A: "内存泄漏，大量对象无法回收",
+      B: "System.gc () 被显式频繁调用",
+      C: "大对象直接进入老年代，且老年代空间不足",
+      D: "新生代设置得太大"
+    },
+    correctAnswer: ["D"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["backend", "fullstack"],
+    applicableLanguages: ["java"],
+    explanation: "新生代设置得大通常会减少对象晋升到老年代的频率，从而减少 Full GC。其他选项都可能导致 Full GC。"
+  },
+
+  // 新增：前端开发题目
+  {
+    content: "以下哪个 CSS 属性不属于盒子模型（Box Model）的组成部分？",
+    type: "single",
+    options: {
+      A: "Margin",
+      B: "Padding",
+      C: "Border",
+      D: "Position"
+    },
+    correctAnswer: ["D"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "盒子模型由 Content, Padding, Border, Margin 组成。Position 是定位属性。"
+  },
+  {
+    content: "console.log (1 + '2') 和 console.log (1 - '2') 的结果分别是？",
+    type: "single",
+    options: {
+      A: "\"12\", -1",
+      B: "3, -1",
+      C: "\"12\", NaN",
+      D: "3, NaN"
+    },
+    correctAnswer: ["A"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: ["typescript"],
+    explanation: "加号遇到字符串会进行拼接 ('12')，减号会尝试将字符串转为数字进行运算 (-1)。"
+  },
+  {
+    content: "下列关于箭头函数 => 的说法，错误的是？",
+    type: "single",
+    options: {
+      A: "箭头函数没有自己的 this",
+      B: "箭头函数不能作为构造函数（不能 new）",
+      C: "箭头函数没有 arguments 对象",
+      D: "箭头函数可以改变 this 指向（通过 call/apply）"
+    },
+    correctAnswer: ["D"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: ["typescript"],
+    explanation: "箭头函数的 this 是在定义时绑定的（词法作用域），无法通过 call/apply/bind 改变。"
+  },
+  {
+    content: "React/Vue 中，组件生命周期 Mount (挂载) 完成后，通常适合做什么？",
+    type: "single",
+    options: {
+      A: "定义 State 初始值",
+      B: "发送网络请求获取数据",
+      C: "销毁定时器",
+      D: "校验 Props 类型"
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: ["typescript"],
+    explanation: "Mount 完成意味着 DOM 已存在，是发送网络请求和操作 DOM 的标准时机。"
+  },
+  {
+    content: "浏览器跨域（CORS）限制主要针对的是？",
+    type: "single",
+    options: {
+      A: "CSS 文件的加载",
+      B: "Script 标签的 src 加载",
+      C: "Ajax/Fetch 网络请求",
+      D: "图片的 src 加载"
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "同源策略主要限制脚本发起的跨域 HTTP 请求（如 Ajax/Fetch）。CSS、Script 标签、图片等通常允许跨域加载。"
+  },
+  {
+    content: "页面白屏，控制台没有任何报错，网络请求也都 200，你首先怀疑？",
+    type: "single",
+    options: {
+      A: "浏览器坏了",
+      B: "这是一个 CSS 问题（如高度 0 或内容被遮挡）",
+      C: "接口返回的数据为空，但前端没有做空状态处理",
+      D: "B 和 C 都有可能"
+    },
+    correctAnswer: ["D"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "无报错白屏通常是渲染层面的问题（CSS）或逻辑层面对空数据的处理不当。"
+  },
+  {
+    content: "UI 给的设计稿在手机上展示时，文字因为太长换行了，导致布局错位，你应该？",
+    type: "single",
+    options: {
+      A: "按照 UI 做，错位就错位，反正不是我的锅",
+      B: "自己做主把字号改小",
+      C: "联系 UI 和产品，确认是 \"截断并显示省略号\" 还是 \"允许换行并调整高度\"",
+      D: "删掉多余的文字"
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "遇到设计与实际内容的冲突，应主动沟通确认解决方案，而不是擅自修改或忽略。"
+  },
+  {
+    content: "后端接口迟迟没好，严重影响你的开发进度，你会？",
+    type: "single",
+    options: {
+      A: "坐在那里玩手机等接口",
+      B: "催一下后端，然后继续等",
+      C: "约定好数据结构，先用 Mock 数据把前端逻辑写好",
+      D: "跟领导告状"
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "使用 Mock 数据并行开发是解决前后端依赖的专业做法。"
+  },
+  {
+    content: "用户反馈 \"点按钮没反应\"，你应该问用户什么最关键的信息来帮助复现？",
+    type: "single",
+    options: {
+      A: "\"你是不是网不好？\"",
+      B: "\"你用的什么手机 / 浏览器？能截个图或录个屏吗？\"",
+      C: "\"多点几次试试？\"",
+      D: "\"重启一下试试？\""
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "环境信息（设备、浏览器）和视觉反馈（截图/录屏）是复现前端问题的关键。"
+  },
+  {
+    content: "移动端 H5 页面滚动卡顿，以下哪个优化方向通常是错误的？",
+    type: "single",
+    options: {
+      A: "减少 DOM 节点数量",
+      B: "使用 transform 代替 top/left 进行定位动画",
+      C: "将所有图片都转成 Base64 以减少请求",
+      D: "对长列表使用虚拟滚动 (Virtual List)"
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "大图片转 Base64 会显著增加 CSS/JS 文件体积，阻塞解析，且无法利用浏览器缓存，反而可能导致页面卡顿。"
+  },
+  {
+    content: "代码 Review 时，同事指出你的命名不规范，但你觉得你的命名更准确，你会？",
+    type: "single",
+    options: {
+      A: "据理力争，坚决不改",
+      B: "表面答应，实际不改",
+      C: "参考团队现有的命名规范，如果规范未定义，则与团队讨论达成一致",
+      D: "说是 AI 写的"
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "backend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "团队规范优于个人偏好，通过讨论达成一致是解决分歧的正确方式。"
+  },
+  {
+    content: "为什么 React/Vue 更新 DOM 时要使用 Virtual DOM（虚拟 DOM）？",
+    type: "single",
+    options: {
+      A: "因为虚拟 DOM 操作比原生 DOM 操作更快",
+      B: "为了跨平台能力，且通过 Diff 算法减少不必要的真实 DOM 重绘与回流",
+      C: "为了代码写起来更短",
+      D: "因为浏览器不再支持原生 DOM 操作"
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: ["typescript"],
+    explanation: "虚拟 DOM 的核心价值在于跨平台抽象和批量更新（Batch Update）以减少真实 DOM 操作，并非在所有场景下都比原生快。"
+  },
+  {
+    content: "下面代码输出什么？for (var i = 0; i < 3; i++) { setTimeout(() => console.log(i), 1); }",
+    type: "single",
+    options: {
+      A: "0 1 2",
+      B: "3 3 3",
+      C: "2 2 2",
+      D: "报错"
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: ["typescript"],
+    explanation: "var 声明的变量具有函数作用域，循环结束后 i 变为 3。setTimeout 回调执行时访问的是同一个 i，因此输出 3 个 3。"
+  },
+  {
+    content: "网页性能指标中，LCP (Largest Contentful Paint) 代表什么？",
+    type: "single",
+    options: {
+      A: "首次绘制时间",
+      B: "页面完全加载时间",
+      C: "视口中最大的内容元素渲染完成的时间",
+      D: "用户首次交互的延迟时间"
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "LCP 衡量页面主要内容加载完成的时间点，是 Core Web Vitals 的重要指标。"
   }
 ];

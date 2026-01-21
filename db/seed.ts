@@ -12,6 +12,7 @@ import { codeDesignQuestions } from "./seed-data/code-design-questions";
 import { architectureQuestions } from "./seed-data/architecture-questions";
 import { databaseQuestions } from "./seed-data/database-questions";
 import { devopsQuestions } from "./seed-data/devops-questions";
+import { qaQuestions } from "./seed-data/qa-questions";
 
 // 题库命名空间 UUID（固定值，用于生成确定性UUID）
 const QUESTION_NAMESPACE = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
@@ -141,6 +142,7 @@ async function seed() {
       ...addStableIds(architectureQuestions, "arch"),
       ...addStableIds(databaseQuestions, "db"),
       ...addStableIds(devopsQuestions, "ops"),
+      ...addStableIds(qaQuestions, "qa"),
     ];
 
     // 分批插入/更新以避免一次性处理过多数据
@@ -182,6 +184,7 @@ async function seed() {
     console.log(`   - 软件架构：${architectureQuestions.length} 题`);
     console.log(`   - 数据库建模：${databaseQuestions.length} 题`);
     console.log(`   - 运维能力：${devopsQuestions.length} 题`);
+    console.log(`   - QA 测试：${qaQuestions.length} 题`);
 
     console.log("\n✨ 种子数据导入完成！");
   } catch (error) {

@@ -40,7 +40,7 @@ export const examsTable = pgTable("exams", {
   framework: varchar("framework", { length: 100 }), // 'nextjs' | 'react' | 'spring' | 'django' | 'express'
   durationMinutes: integer("duration_minutes").default(10).notNull(),
   passingScore: integer("passing_score").default(60).notNull(),
-  totalQuestions: integer("total_questions").default(20).notNull(),
+  totalQuestions: integer("total_questions").default(25).notNull(),
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

@@ -37,20 +37,21 @@ export interface Question {
 }
 
 /**
- * 题目分布策略（总20题）：
+ * 题目分布策略（总25题）：
  * - 代码设计：3易 + 2中 = 5题
- * - 软件架构：2易 + 2中 + 1难 = 5题
+ * - 软件架构：3易 + 2中 = 5题
  * - 数据库建模：3易 + 2中 = 5题
- * - 运维能力：3易 + 1中 + 1难 = 5题
+ * - 运维能力：3易 + 2中 = 5题
+ * - QA测试：3易 + 2中 = 5题
  *
- * 总计：11易 + 7中 + 2难 = 20题
- * 其中：18选择题 + 2简答题（架构1题 + 数据库1题）
+ * 总计：15易 + 10中 = 25题
  */
 const QUESTION_DISTRIBUTION = {
   code_design: { easy: 3, medium: 2, hard: 0 },
-  architecture: { easy: 2, medium: 2, hard: 1 }, // 1道hard是陈述题
-  database: { easy: 3, medium: 2, hard: 0 }, // 1道medium是陈述题
-  devops: { easy: 3, medium: 1, hard: 1 },
+  architecture: { easy: 3, medium: 2, hard: 0 },
+  database: { easy: 3, medium: 2, hard: 0 },
+  devops: { easy: 3, medium: 2, hard: 0 },
+  qa_testing: { easy: 3, medium: 2, hard: 0 },
 } as const;
 
 /**
@@ -78,6 +79,7 @@ function groupQuestions(questions: Question[]) {
     architecture: { easy: [], medium: [], hard: [] },
     database: { easy: [], medium: [], hard: [] },
     devops: { easy: [], medium: [], hard: [] },
+    qa_testing: { easy: [], medium: [], hard: [] },
   };
 
   for (const question of questions) {
@@ -165,31 +167,8 @@ export async function generateExamQuestions(
             );
             selected.push(...pool);
           } else {
-            // 优先抽取简答题，确保简答题能被选中
-            const essayPool = pool.filter(q => q.type === 'essay');
-            const choicePool = pool.filter(q => q.type !== 'essay');
-
-            const picked: Question[] = [];
-
-            // 先从简答题池中抽取（如果有）
-            if (essayPool.length > 0) {
-              const essayCount = Math.min(count, essayPool.length);
-              picked.push(...selectRandom(essayPool, essayCount));
-            }
-
-            // 再从选择题池中补充剩余数量
-            const remainingCount = count - picked.length;
-            if (remainingCount > 0 && choicePool.length >= remainingCount) {
-              picked.push(...selectRandom(choicePool, remainingCount));
-            } else if (remainingCount > 0) {
-              // 选择题不足，记录错误
-              errors.push(
-                `${dimension} - ${difficulty} 选择题不足：需要${remainingCount}题，实际${choicePool.length}题`
-              );
-              picked.push(...choicePool);
-            }
-
-            selected.push(...picked);
+            // 直接随机抽取，不强制区分题型
+            selected.push(...selectRandom(pool, count));
           }
         }
       }
@@ -200,9 +179,9 @@ export async function generateExamQuestions(
       throw new Error(`题库不足，无法生成考试：\n${errors.join('\n')}`);
     }
 
-    // 5. 验证题目数量（必须恰好20题）
-    if (selected.length !== 20) {
-      throw new Error(`题目数量错误：需要20题，实际生成${selected.length}题`);
+    // 5. 验证题目数量（必须恰好25题）
+    if (selected.length !== 25) {
+      throw new Error(`题目数量错误：需要25题，实际生成${selected.length}题`);
     }
 
     // 6. 验证题目ID唯一性（防止重复）
@@ -240,14 +219,8 @@ export function validateQuestionDistribution(questions: Question[]): {
   const errors: string[] = [];
 
   // 检查总数
-  if (questions.length !== 20) {
-    errors.push(`题目总数应为20题，实际${questions.length}题`);
-  }
-
-  // 检查简答题数量
-  const essayCount = questions.filter((q) => q.type === "essay").length;
-  if (essayCount !== 2) {
-    errors.push(`简答题应为2题，实际${essayCount}题`);
+  if (questions.length !== 25) {
+    errors.push(`题目总数应为25题，实际${questions.length}题`);
   }
 
   // 检查各维度题目数量

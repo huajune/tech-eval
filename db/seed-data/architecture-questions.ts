@@ -1,4 +1,6 @@
-export const architectureQuestions = [
+import { SeedQuestion } from "./types";
+
+export const architectureQuestions: SeedQuestion[] = [
   // 简单题（8题）
   {
     content: "在微服务架构中，以下哪种通信方式最适合服务间的同步调用？",
@@ -339,5 +341,41 @@ export const architectureQuestions = [
     applicableLanguages: null,
     explanation: "评分标准（总分5分）：\\n- 提到Redis/Memcached缓存热点数据（库存、商品信息）：1分\\n- 提到数据库分片或读写分离：1分\\n- 提到消息队列削峰/异步处理：1分\\n- 提到幂等性设计（唯一订单号/分布式锁/token机制）：1分\\n- 方案整体合理性与可行性：1分",
     referenceAnswer: "参考方案要点：\\n1. 缓存策略：Redis缓存库存、商品信息、用户信息，设置合理过期时间\\n2. 数据库设计：订单表按用户ID哈希分片，配置读写分离，主库写从库读\\n3. 消息队列：Kafka/RabbitMQ异步处理订单状态变更、通知、日志，削峰限流\\n4. 幂等性保证：使用雪花算法生成全局唯一订单号，Redis分布式锁防止重复下单，接口使用Token机制防止重复提交"
+  },
+
+  // 新增：Java后端开发题目
+  {
+    content: "分布式系统中，关于 \"最终一致性\" 的描述，正确的是？",
+    type: "single",
+    options: {
+      A: "所有节点的数据必须时刻保持一致",
+      B: "允许在一段时间内数据不一致，但最终会达到一致状态",
+      C: "数据库必须使用 Serializable 隔离级别",
+      D: "必须使用 2PC (两阶段提交) 协议"
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "architecture",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["backend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "最终一致性（Eventual Consistency）是 BASE 理论的核心，允许系统在短暂时间内数据不一致，但保证最终达到一致状态，以换取高可用性。"
+  },
+  {
+    content: "使用 Redis 实现分布式锁时，为了防止 \"死锁\"（持有锁的客户端挂掉导致锁不释放），必须设置？",
+    type: "single",
+    options: {
+      A: "锁的过期时间 (TTL)",
+      B: "锁的拥有者 ID",
+      C: "Redis 的持久化策略",
+      D: "哨兵模式"
+    },
+    correctAnswer: ["A"],
+    abilityDimension: "architecture",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["backend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "设置 TTL (Time To Live) 确保即使客户端崩溃，锁也会在过期后自动释放，防止死锁。"
   }
 ];

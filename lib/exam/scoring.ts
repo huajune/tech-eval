@@ -72,6 +72,7 @@ export async function calculateExamResult(sessionId: string) {
       architecture: { score: 0, total: 0 },
       database: { score: 0, total: 0 },
       devops: { score: 0, total: 0 },
+      qa_testing: { score: 0, total: 0 },
     };
 
     for (const question of questions) {
@@ -115,12 +116,13 @@ export async function calculateExamResult(sessionId: string) {
     }
 
     // 5. 计算加权总分
-    // 代码25% + 架构30% + 数据库25% + 运维20%
+    // 代码20% + 架构20% + 数据库20% + 运维20% + QA20%
     const totalScore = Math.round(
-      normalizedScores.code_design * 0.25 +
-        normalizedScores.architecture * 0.3 +
-        normalizedScores.database * 0.25 +
-        normalizedScores.devops * 0.2
+      (normalizedScores.code_design || 0) * 0.2 +
+        (normalizedScores.architecture || 0) * 0.2 +
+        (normalizedScores.database || 0) * 0.2 +
+        (normalizedScores.devops || 0) * 0.2 +
+        (normalizedScores.qa_testing || 0) * 0.2
     );
 
     // 6. 职级映射

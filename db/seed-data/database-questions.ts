@@ -1,4 +1,6 @@
-export const databaseQuestions = [
+import { SeedQuestion } from "./types";
+
+export const databaseQuestions: SeedQuestion[] = [
   // 简单题（12题）
   {
     content: "在关系型数据库中，以下哪个约束可以确保列值的唯一性？",
@@ -339,5 +341,24 @@ export const databaseQuestions = [
     applicableRoles: ["backend", "fullstack"],
     applicableLanguages: null,
     explanation: "MVCC通过保存数据的多个版本实现快照读，使读写不阻塞。PostgreSQL和MySQL InnoDB都实现了MVCC。但MVCC不能完全替代锁，写写操作仍需要锁来避免冲突。"
+  },
+
+  // 新增：Java后端开发题目
+  {
+    content: "在 MySQL 中，执行 Select * from users where name like '% Jack'，索引会？",
+    type: "single",
+    options: {
+      A: "正常命中",
+      B: "失效（全表扫描）",
+      C: "部分命中",
+      D: "报错"
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "database",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "LIKE 查询以通配符 % 开头会导致索引失效，触发全表扫描。"
   }
 ];

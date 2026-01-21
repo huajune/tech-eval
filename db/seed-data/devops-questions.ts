@@ -1,4 +1,6 @@
-export const devopsQuestions = [
+import { SeedQuestion } from "./types";
+
+export const devopsQuestions: SeedQuestion[] = [
   // 简单题（12题）
   {
     content: "Linux中，以下哪个命令用于查看当前目录下的文件列表？",
@@ -343,5 +345,41 @@ export const devopsQuestions = [
     applicableRoles: ["backend", "fullstack"],
     applicableLanguages: null,
     explanation: "Kubernetes提供容器编排、自动伸缩、故障恢复等功能。Service Mesh（如Istio）在应用层提供服务通信、可观测性、安全等能力。容器编排可以在本地、云端或混合环境使用。"
+  },
+
+  // 新增：Java后端/前端开发题目中的DevOps相关
+  {
+    content: "在 Git 中，要把当前分支的修改暂存起来去做别的事，应使用？",
+    type: "single",
+    options: {
+      A: "git commit",
+      B: "git stash",
+      C: "git merge",
+      D: "git push"
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "devops",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "backend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "git stash 用于暂存当前工作区的修改，以便切换分支处理其他任务，之后可以通过 git stash pop 恢复。"
+  },
+  {
+    content: "这里的 npm install 报错，提示权限不足（EACCES），最不推荐的做法是？",
+    type: "single",
+    options: {
+      A: "使用 sudo 强制安装",
+      B: "检查 npm cache",
+      C: "修改 npm 目录的归属权限",
+      D: "使用 nvm 管理 node 版本"
+    },
+    correctAnswer: ["A"],
+    abilityDimension: "devops",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend", "fullstack"],
+    applicableLanguages: null,
+    explanation: "使用 sudo 安装 npm 包会导致文件权限混乱，后续操作可能需要更多 sudo 权限，甚至造成安全风险。推荐使用 nvm 或修改目录权限。"
   }
 ];

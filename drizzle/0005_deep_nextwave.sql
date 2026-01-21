@@ -1,0 +1,1 @@
+ALTER TABLE "exams" ALTER COLUMN "total_questions" SET DEFAULT 25;
