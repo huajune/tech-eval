@@ -1,385 +1,107 @@
 import { SeedQuestion } from "./types";
 
 export const devopsQuestions: SeedQuestion[] = [
-  // 简单题（12题）
+  // 简单题（6题）
   {
-    content: "Linux中，以下哪个命令用于查看当前目录下的文件列表？",
+    content: "在 Webpack 构建中，Loader 和 Plugin 的区别是？",
     type: "single",
     options: {
-      A: "cd",
-      B: "ls",
-      C: "pwd",
-      D: "mkdir"
+      A: "没有区别",
+      B: "Loader 用于转换文件（如 less 转 css），Plugin 用于扩展构建功能（如压缩、注入环境变量）",
+      C: "Loader 运行在打包后，Plugin 运行在打包前",
+      D: "Plugin 只能处理 JS 文件",
     },
     correctAnswer: ["B"],
     abilityDimension: "devops",
     difficulty: "easy",
     weight: 1,
-    applicableRoles: ["backend", "fullstack"],
+    applicableRoles: ["frontend"],
     applicableLanguages: null,
-    explanation: "ls命令用于列出目录内容。cd用于切换目录，pwd显示当前路径，mkdir创建目录。"
+    explanation: "Loader是模块转换器，用于处理不同类型的文件资源（如将SCSS转为CSS）。Plugin是功能扩展器，可以在Webpack构建流程的各个生命周期钩子中注入自定义逻辑，实现诸如打包优化、资源管理等复杂功能。",
   },
   {
-    content: "Docker中，以下哪个命令用于查看正在运行的容器？",
+    content: "线上服务 CPU 飙高，使用 top -H -p <pid> 命令的目的是？",
     type: "single",
     options: {
-      A: "docker images",
-      B: "docker ps",
-      C: "docker run",
-      D: "docker build"
+      A: "查看该进程打开的文件句柄",
+      B: "查看该进程下的所有线程的 CPU 占用情况",
+      C: "强制杀死进程",
+      D: "查看网络连接数",
     },
     correctAnswer: ["B"],
     abilityDimension: "devops",
     difficulty: "easy",
     weight: 1,
-    applicableRoles: ["backend", "fullstack"],
+    applicableRoles: ["backend"],
     applicableLanguages: null,
-    explanation: "docker ps显示运行中的容器。docker images列出镜像，docker run运行容器，docker build构建镜像。"
+    explanation: "B对：top -H -p <pid>命令可以查看指定进程内各个线程的详细信息，包括CPU占用率，是定位Java程序中“某个线程CPU占满”问题的第一步。A错：查看文件句柄用lsof。C错：杀死进程用kill。D错：查看网络连接用netstat或ss。",
   },
   {
-    content: "Git中，以下哪个命令用于查看提交历史？",
+    content: "线上服务 CPU 飙高，使用 top -H -p <pid> 命令的目的是？",
     type: "single",
     options: {
-      A: "git status",
-      B: "git log",
-      C: "git diff",
-      D: "git branch"
+      A: "查看该进程打开的文件句柄",
+      B: "查看该进程下的所有线程的 CPU 占用情况",
+      C: "强制杀死进程",
+      D: "查看网络连接数",
     },
     correctAnswer: ["B"],
     abilityDimension: "devops",
     difficulty: "easy",
     weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
+    applicableRoles: ["backend"],
     applicableLanguages: null,
-    explanation: "git log显示提交历史。git status显示工作区状态，git diff显示差异，git branch管理分支。"
+    explanation: "B对：top -H -p <pid>命令可以查看指定进程内各个线程的详细信息，包括CPU占用率，是定位Java程序中“某个线程CPU占满”问题的第一步。A错：查看文件句柄用lsof。C错：杀死进程用kill。D错：查看网络连接用netstat或ss。",
   },
   {
-    content: "在Linux中，以下哪个命令可以查看系统的CPU和内存使用情况？",
+    content: "在 Linux 服务器上，查看当前目录下文件大小时，使用哪个命令最直观？",
     type: "single",
     options: {
-      A: "ls",
-      B: "top",
-      C: "cd",
-      D: "cat"
+      A: "ls -l",
+      B: "ls -lh",
+      C: "ps -ef",
+      D: "cat file",
     },
     correctAnswer: ["B"],
     abilityDimension: "devops",
     difficulty: "easy",
     weight: 1,
-    applicableRoles: ["backend", "fullstack"],
+    applicableRoles: ["frontend","backend","fullstack"],
     applicableLanguages: null,
-    explanation: "top命令实时显示系统资源使用情况，包括CPU、内存、进程等。类似的还有htop命令。"
+    explanation: "-h 选项会以 K/M/G 等人类可读格式显示大小，最为直观。",
   },
   {
-    content: "以下哪个是Docker镜像的正确命名格式？",
+    content: "发现服务器磁盘满了，使用什么命令组合能最快找到是哪个文件占用了最大空间？",
     type: "single",
     options: {
-      A: "image:tag",
-      B: "repository/image:tag",
-      C: "registry/repository/image:tag",
-      D: "以上都可以"
-    },
-    correctAnswer: ["D"],
-    abilityDimension: "devops",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "Docker镜像命名可以是image:tag（本地）、repository/image:tag（DockerHub）、registry/repository/image:tag（私有仓库）。"
-  },
-  {
-    content: "CI/CD中的CI代表什么？",
-    type: "single",
-    options: {
-      A: "Code Integration",
-      B: "Continuous Integration",
-      C: "Container Integration",
-      D: "Cloud Integration"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "devops",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "CI/CD代表持续集成（Continuous Integration）和持续交付/部署（Continuous Delivery/Deployment）。"
-  },
-  {
-    content: "Linux中，以下哪个命令可以查找包含特定文本的文件？",
-    type: "single",
-    options: {
-      A: "find",
-      B: "grep",
-      C: "locate",
-      D: "which"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "devops",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "grep用于在文件中搜索文本模式。find用于查找文件，locate用于快速定位文件，which查找命令路径。"
-  },
-  {
-    content: "在Dockerfile中，以下哪个指令用于设置容器启动时执行的命令？",
-    type: "single",
-    options: {
-      A: "RUN",
-      B: "CMD",
-      C: "COPY",
-      D: "FROM"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "devops",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "CMD指定容器启动时的默认命令。RUN在构建时执行命令，COPY复制文件，FROM指定基础镜像。"
-  },
-  {
-    content: "Git中，以下哪个命令用于创建新分支并切换到该分支？",
-    type: "single",
-    options: {
-      A: "git branch new-branch",
-      B: "git checkout new-branch",
-      C: "git checkout -b new-branch",
-      D: "git create new-branch"
+      A: "ls -a",
+      B: "find / -name “*”",
+      C: "du -sh * | sort -rh | head",
+      D: "top",
     },
     correctAnswer: ["C"],
     abilityDimension: "devops",
     difficulty: "easy",
     weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
+    applicableRoles: ["frontend","backend","fullstack"],
     applicableLanguages: null,
-    explanation: "git checkout -b new-branch 创建并切换到新分支。等价于 git branch new-branch && git checkout new-branch。"
+    explanation: "du -sh * 查看当前目录下所有文件和目录的大小，sort -rh 逆序（从大到小）排序，head 取前几行。",
   },
   {
-    content: "Linux中，chmod 755命令的含义是什么？",
-    type: "single",
+    content: "线上出现报错，你需要统计 error.log 日志中，“NullPointerException” 出现的次数，并按出现频率排序。以下哪些命令组合片段是相关的？",
+    type: "multiple",
     options: {
-      A: "所有者可读写执行，组用户和其他用户只可读",
-      B: "所有者可读写执行，组用户和其他用户可读可执行",
-      C: "所有用户都可读写执行",
-      D: "只有所有者可读写执行"
+      A: "grep “NullPointerException” error.log",
+      B: "wc -l",
+      C: "sort | uniq -c",
+      D: "chmod +x",
     },
-    correctAnswer: ["B"],
+    correctAnswer: ["A","B","C"],
     abilityDimension: "devops",
     difficulty: "easy",
     weight: 1,
-    applicableRoles: ["backend", "fullstack"],
+    applicableRoles: ["frontend","backend","fullstack"],
     applicableLanguages: null,
-    explanation: "755表示：所有者rwx(7=4+2+1)，组用户rx(5=4+1)，其他用户rx(5=4+1)。"
-  },
-  {
-    content: "Nginx作为反向代理服务器的主要作用是什么？",
-    type: "single",
-    options: {
-      A: "直接运行应用程序",
-      B: "转发客户端请求到后端服务器",
-      C: "存储静态文件",
-      D: "编译源代码"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "devops",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "Nginx作为反向代理，接收客户端请求并转发到后端服务器，可以实现负载均衡、缓存、SSL终止等功能。"
-  },
-  {
-    content: "在Linux中，以下哪个命令可以实时查看文件的新增内容？",
-    type: "single",
-    options: {
-      A: "cat",
-      B: "tail -f",
-      C: "head",
-      D: "more"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "devops",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "tail -f 实时跟踪文件的新增内容，常用于查看日志文件。cat一次性显示全部，head显示前几行，more分页显示。"
-  },
-
-  // 中等题（6题）
-  {
-    content: "在Docker环境中，你需要让容器A访问容器B的服务，以下哪种方式最合理？",
-    type: "single",
-    options: {
-      A: "使用容器B的IP地址直接访问（如 http://172.17.0.3:8080）",
-      B: "将容器B的端口映射到宿主机，容器A通过宿主机IP访问",
-      C: "将两个容器放在同一个自定义网络中，通过容器名访问",
-      D: "使用 docker exec 进入容器A，手动配置hosts文件"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "devops",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "自定义网络支持DNS解析，容器可以通过名称相互访问，更灵活可靠。容器IP会变化不可靠，端口映射增加复杂度，手动配置hosts不便维护。"
-  },
-  {
-    content: "关于Git的分支管理，以下哪些说法是正确的？（多选）",
-    type: "multiple",
-    options: {
-      A: "master/main分支应该始终保持可发布状态",
-      B: "feature分支应该从develop分支创建",
-      C: "可以直接在master分支上开发新功能",
-      D: "完成功能开发后应该删除feature分支"
-    },
-    correctAnswer: ["A", "B", "D"],
-    abilityDimension: "devops",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "Git Flow规范：master保持稳定，feature从develop创建，功能合并后删除feature分支保持仓库整洁。不应直接在master开发。"
-  },
-  {
-    content: "关于Docker容器的资源限制，以下哪些说法是正确的？（多选）",
-    type: "multiple",
-    options: {
-      A: "可以使用--memory限制容器的内存使用",
-      B: "可以使用--cpus限制容器的CPU使用",
-      C: "容器默认可以使用主机的所有资源",
-      D: "资源限制只能在创建容器时设置，不能修改"
-    },
-    correctAnswer: ["A", "B", "C"],
-    abilityDimension: "devops",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "Docker支持--memory和--cpus限制资源。容器默认可使用所有资源。可以使用docker update命令修改运行中容器的资源限制。"
-  },
-  {
-    content: "在Linux中，以下哪些命令可以用于查看网络连接状态？（多选）",
-    type: "multiple",
-    options: {
-      A: "netstat",
-      B: "ss",
-      C: "lsof",
-      D: "ps"
-    },
-    correctAnswer: ["A", "B", "C"],
-    abilityDimension: "devops",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "netstat显示网络连接（较老），ss是现代替代（更快），lsof可以查看进程打开的网络连接。ps用于查看进程，不是网络工具。"
-  },
-  {
-    content: "关于Kubernetes，以下哪些组件是控制平面（Control Plane）的一部分？（多选）",
-    type: "multiple",
-    options: {
-      A: "kube-apiserver",
-      B: "kube-scheduler",
-      C: "kubelet",
-      D: "etcd"
-    },
-    correctAnswer: ["A", "B", "D"],
-    abilityDimension: "devops",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "控制平面包括kube-apiserver（API服务器）、kube-scheduler（调度器）、kube-controller-manager（控制器）、etcd（数据存储）。kubelet运行在工作节点上。"
-  },
-  {
-    content: "关于CI/CD流水线，以下哪些阶段是常见的？（多选）",
-    type: "multiple",
-    options: {
-      A: "代码检查（Lint）",
-      B: "单元测试",
-      C: "构建镜像",
-      D: "手动部署"
-    },
-    correctAnswer: ["A", "B", "C"],
-    abilityDimension: "devops",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "CI/CD流水线通常包括：代码检查、单元测试、构建、打包、自动部署。手动部署违背了CD的理念。"
-  },
-
-  // 困难题（2题）
-  {
-    content: "关于Docker的多阶段构建，以下哪些说法是正确的？（多选）",
-    type: "multiple",
-    options: {
-      A: "可以减小最终镜像的大小",
-      B: "可以在构建过程中使用不同的基础镜像",
-      C: "可以避免将构建工具打包到最终镜像",
-      D: "只能在Dockerfile中使用一次FROM指令"
-    },
-    correctAnswer: ["A", "B", "C"],
-    abilityDimension: "devops",
-    difficulty: "hard",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "多阶段构建允许在Dockerfile中使用多个FROM指令，每个阶段可以使用不同的基础镜像，只将最终需要的文件复制到最终镜像，减小镜像大小。"
-  },
-  {
-    content: "关于容器编排和服务网格，以下哪些说法是正确的？（多选）",
-    type: "multiple",
-    options: {
-      A: "Kubernetes可以自动管理容器的生命周期",
-      B: "Service Mesh可以处理服务间的通信、监控和安全",
-      C: "Istio是一个流行的Service Mesh实现",
-      D: "容器编排只能在云环境中使用"
-    },
-    correctAnswer: ["A", "B", "C"],
-    abilityDimension: "devops",
-    difficulty: "hard",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "Kubernetes提供容器编排、自动伸缩、故障恢复等功能。Service Mesh（如Istio）在应用层提供服务通信、可观测性、安全等能力。容器编排可以在本地、云端或混合环境使用。"
-  },
-
-  // 新增：Java后端/前端开发题目中的DevOps相关
-  {
-    content: "在 Git 中，要把当前分支的修改暂存起来去做别的事，应使用？",
-    type: "single",
-    options: {
-      A: "git commit",
-      B: "git stash",
-      C: "git merge",
-      D: "git push"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "devops",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "git stash 用于暂存当前工作区的修改，以便切换分支处理其他任务，之后可以通过 git stash pop 恢复。"
-  },
-  {
-    content: "这里的 npm install 报错，提示权限不足（EACCES），最不推荐的做法是？",
-    type: "single",
-    options: {
-      A: "使用 sudo 强制安装",
-      B: "检查 npm cache",
-      C: "修改 npm 目录的归属权限",
-      D: "使用 nvm 管理 node 版本"
-    },
-    correctAnswer: ["A"],
-    abilityDimension: "devops",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "使用 sudo 安装 npm 包会导致文件权限混乱，后续操作可能需要更多 sudo 权限，甚至造成安全风险。推荐使用 nvm 或修改目录权限。"
+    explanation: "A：过滤出包含错误的行。B：统计行数（简单统计总数用）。C：排序并去重统计每种错误出现的次数（高级统计用）。完整命令可能是 grep “Error” log | sort | uniq -c | sort -nr。D 错：chmod 是修改文件权限的，与查看日志无关。考察点：Linux 管道组合命令的实际应用。",
   }
 ];

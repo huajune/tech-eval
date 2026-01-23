@@ -426,7 +426,7 @@ export default function ExamSetupPage() {
           {/* 考试说明 */}
           <div className="text-sm text-muted-foreground space-y-1 pt-4 border-t">
             <p>• 考试时长：10分钟</p>
-            <p>• 题目数量：20题（18道选择题 + 2道简答题）</p>
+            <p>• 题目数量：15题（选择题和简答题）</p>
             <p>• 考察维度：代码设计、软件架构、数据库建模、运维能力</p>
           </div>
         </CardContent>

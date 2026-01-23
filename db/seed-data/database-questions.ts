@@ -1,364 +1,196 @@
 import { SeedQuestion } from "./types";
 
 export const databaseQuestions: SeedQuestion[] = [
-  // 简单题（12题）
+  // 简单题（6题）
   {
-    content: "在关系型数据库中，以下哪个约束可以确保列值的唯一性？",
+    content: "在 InnoDB 引擎的可重复读（Repeatable Read）隔离级别下，主要通过什么机制解决了大部分“幻读”问题？",
     type: "single",
     options: {
-      A: "PRIMARY KEY",
-      B: "UNIQUE",
-      C: "FOREIGN KEY",
-      D: "CHECK"
+      A: "悲观锁",
+      B: "Next-Key Lock（临键锁）和 MVCC",
+      C: "读写分离",
+      D: "序列化",
     },
     correctAnswer: ["B"],
     abilityDimension: "database",
     difficulty: "easy",
     weight: 1,
-    applicableRoles: ["backend", "fullstack"],
+    applicableRoles: ["backend"],
     applicableLanguages: null,
-    explanation: "UNIQUE约束确保列值唯一但允许NULL。PRIMARY KEY也保证唯一性但不允许NULL。题目问的是唯一性约束，UNIQUE是最直接的答案。"
+    explanation: "B对：InnoDB在RR级别下，通过MVCC（多版本并发控制）解决了快照读的幻读问题，通过Next-Key Lock（记录锁+间隙锁）解决了当前读的幻读问题。A/C/D错：它们并非InnoDB解决幻读的核心机制。",
   },
   {
-    content: "SQL中的LEFT JOIN和INNER JOIN的主要区别是什么？",
+    content: "在 InnoDB 引擎的可重复读（Repeatable Read）隔离级别下，主要通过什么机制解决了大部分“幻读”问题？",
     type: "single",
     options: {
-      A: "LEFT JOIN返回左表的所有记录，INNER JOIN只返回匹配的记录",
-      B: "LEFT JOIN比INNER JOIN快",
-      C: "LEFT JOIN不能使用WHERE子句",
-      D: "没有区别"
+      A: "悲观锁",
+      B: "Next-Key Lock（临键锁）和 MVCC",
+      C: "读写分离",
+      D: "序列化",
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "database",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend"],
+    applicableLanguages: null,
+    explanation: "B对：InnoDB在RR级别下，通过MVCC（多版本并发控制）解决了快照读的幻读问题，通过Next-Key Lock（记录锁+间隙锁）解决了当前读的幻读问题。A/C/D错：它们并非InnoDB解决幻读的核心机制。",
+  },
+  {
+    content: "测试结束需要清理脏数据，删除表中所有数据但保留表结构的 SQL 是？",
+    type: "single",
+    options: {
+      A: "DROP TABLE table_name;",
+      B: "DELETE FROM table_name;",
+      C: "REMOVE ALL FROM table_name;",
+      D: "ALTER TABLE table_name DROP;",
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "database",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend","backend","fullstack"],
+    applicableLanguages: null,
+    explanation: "DELETE FROM 用于删除表中的数据但保留表结构，DROP TABLE 是删除整个表。",
+  },
+  {
+    content: "两个事务同时执行，事务 A 读到了事务 B 未提交的数据，这属于哪种隔离级别的问题？",
+    type: "single",
+    options: {
+      A: "脏读 (Dirty Read)",
+      B: "不可重复读",
+      C: "幻读",
+      D: "串行化",
     },
     correctAnswer: ["A"],
     abilityDimension: "database",
     difficulty: "easy",
     weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
+    applicableRoles: ["frontend","backend","fullstack"],
     applicableLanguages: null,
-    explanation: "LEFT JOIN返回左表所有记录，即使右表没有匹配也会返回（右表字段为NULL）。INNER JOIN只返回两表都匹配的记录。"
+    explanation: "脏读特指读到了另一个事务未提交的数据，通常发生在隔离级别最低的 Read Uncommitted 级别。",
   },
   {
-    content: "数据库索引的主要作用是什么？",
+    content: "发现某条 SQL 查询语句执行非常慢（慢查询），为了分析原因，测试人员可以采取哪些手段？",
+    type: "multiple",
+    options: {
+      A: "在 SQL 语句前加上 EXPLAIN 关键字，查看执行计划（是否命中索引）。",
+      B: "检查 WHERE 条件字段的数据区分度（Selectivity），区分度太低（如性别）可能导致索引失效。",
+      C: "只要给查询涉及的所有字段都加上索引，一定能解决问题。",
+      D: "检查是否使用了 SELECT *，导致回表查询过多或传输数据量过大。",
+    },
+    correctAnswer: ["A","B","D"],
+    abilityDimension: "database",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend","backend","fullstack"],
+    applicableLanguages: null,
+    explanation: "A 对：最标准的排查手段。B 对：索引选择性差（如性别只有男女）会导致全表扫描。D 对：避免 Select * 是基础优化规范。C 错：索引不是越多越好，过多的索引会降低“写入/更新”速度，且不合理的联合索引可能根本用不上。考察点：数据库性能调优的基础意识。",
+  },
+  {
+    content: "作为测试人员，你需要验证后台报表中的“高价值用户列表”。数据库中有一张订单表 orders，包含字段：user_id (用户ID) 和 amount (订单金额)。 你需要写一条 SQL，筛选出 平均订单金额超过 500 元 的所有用户 ID。下列 SQL 正确的是？",
     type: "single",
     options: {
-      A: "加快数据插入速度",
-      B: "加快数据查询速度",
-      C: "减少存储空间",
-      D: "保证数据一致性"
+      A: "SELECT user_id FROM orders WHERE AVG(amount) > 500 GROUP BY user_id;",
+      B: "SELECT user_id FROM orders GROUP BY user_id HAVING AVG(amount) > 500;",
+      C: "SELECT user_id FROM orders WHERE amount > 500 GROUP BY user_id;",
+      D: "SELECT DISTINCT user_id FROM orders WHERE AVG(amount) > 500;",
     },
     correctAnswer: ["B"],
     abilityDimension: "database",
     difficulty: "easy",
     weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
+    applicableRoles: ["frontend","backend","fullstack"],
     applicableLanguages: null,
-    explanation: "索引通过创建数据结构（如B+树）加快查询速度，但会增加存储空间，降低插入/更新性能。"
-  },
-  {
-    content: "在PostgreSQL中，JSONB类型相比JSON类型的主要优势是什么？",
-    type: "single",
-    options: {
-      A: "占用更少的存储空间",
-      B: "支持索引和更快的查询",
-      C: "保留JSON的格式和空格",
-      D: "插入速度更快"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "database",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "JSONB是二进制格式，支持索引（GIN索引）和高效查询，但插入时需要转换，略慢于JSON。JSON保留格式，JSONB不保留。"
-  },
-  {
-    content: "数据库事务的ACID特性中，I代表什么？",
-    type: "single",
-    options: {
-      A: "Integrity（完整性）",
-      B: "Isolation（隔离性）",
-      C: "Identity（标识性）",
-      D: "Index（索引）"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "database",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "ACID分别代表：Atomicity（原子性）、Consistency（一致性）、Isolation（隔离性）、Durability（持久性）。"
-  },
-  {
-    content: "以下哪种SQL语句用于删除表中的所有数据但保留表结构？",
-    type: "single",
-    options: {
-      A: "DROP TABLE",
-      B: "DELETE FROM",
-      C: "TRUNCATE TABLE",
-      D: "ALTER TABLE"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "database",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "TRUNCATE TABLE快速删除所有数据但保留表结构，比DELETE FROM快且不记录每行删除日志。DROP TABLE会删除整个表。"
-  },
-  {
-    content: "在数据库设计中，范式化（Normalization）的主要目的是什么？",
-    type: "single",
-    options: {
-      A: "提高查询速度",
-      B: "减少数据冗余",
-      C: "增加存储空间",
-      D: "简化SQL语句"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "database",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "范式化通过消除冗余和异常来减少数据冗余，提高数据一致性。但过度范式化可能影响查询性能，需要权衡。"
-  },
-  {
-    content: "SQL中的GROUP BY子句的主要作用是什么？",
-    type: "single",
-    options: {
-      A: "排序查询结果",
-      B: "过滤查询结果",
-      C: "对数据进行分组统计",
-      D: "连接多个表"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "database",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "GROUP BY用于将数据分组，通常与聚合函数（COUNT、SUM、AVG等）一起使用进行统计分析。"
-  },
-  {
-    content: "数据库中的外键（Foreign Key）主要用于什么？",
-    type: "single",
-    options: {
-      A: "加快查询速度",
-      B: "保证数据的参照完整性",
-      C: "减少存储空间",
-      D: "支持全文检索"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "database",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "外键约束确保子表的值必须在父表中存在，维护表间的参照完整性。可以防止插入无效数据和删除被引用的数据。"
-  },
-  {
-    content: "在MySQL中，CHAR和VARCHAR类型的主要区别是什么？",
-    type: "single",
-    options: {
-      A: "CHAR是定长，VARCHAR是变长",
-      B: "CHAR不能存储中文，VARCHAR可以",
-      C: "CHAR更快，VARCHAR更慢",
-      D: "没有区别"
-    },
-    correctAnswer: ["A"],
-    abilityDimension: "database",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "CHAR是定长字符类型，不足部分用空格填充。VARCHAR是变长类型，根据实际内容长度存储。短字符串用CHAR效率高，长度不定用VARCHAR节省空间。"
-  },
-  {
-    content: "SQL注入攻击的主要防御措施是什么？",
-    type: "single",
-    options: {
-      A: "使用复杂密码",
-      B: "使用参数化查询",
-      C: "增加服务器防火墙",
-      D: "使用HTTPS协议"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "database",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "参数化查询（预编译语句）是防止SQL注入的最有效方法，将SQL语句和参数分离，避免拼接SQL字符串。"
-  },
-  {
-    content: "数据库连接池的主要作用是什么？",
-    type: "single",
-    options: {
-      A: "加密数据库连接",
-      B: "复用数据库连接，提高性能",
-      C: "备份数据库数据",
-      D: "监控数据库性能"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "database",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "连接池预先创建和管理一定数量的数据库连接，避免频繁创建和关闭连接的开销，提高应用性能。"
+    explanation: "- A 错： WHERE 子句中不能直接使用聚合函数（如 AVG, SUM）。聚合后的过滤必须使用 HAVING。这是最经典的 SQL 面试坑。\n- B 对： 先 GROUP BY 用户，算出平均值，再用 HAVING 筛选平均值 > 500 的组。\n- C 错： 这条 SQL 的含义是“筛选出单笔订单大于 500 的用户”，而不是“平均金额”。\n- D 错： 语法错误，WHERE 中不能用 AVG。",
   },
 
-  // 中等题（6题，包含1道陈述题）
+  // 中等题（4题）
   {
-    content: "以下关于数据库索引的说法，哪些是正确的？（多选）",
+    content: "现有 Service A 调用 Service B。A 方法上有事务 @Transactional，B 方法上配置了不同的传播行为。下列场景描述正确的有？",
     type: "multiple",
     options: {
-      A: "在高频查询的列上创建索引可以显著提升查询性能",
-      B: "索引越多越好，应该给所有列都加上索引",
-      C: "联合索引(a, b, c)可以用于查询条件 WHERE a=1 AND b=2",
-      D: "WHERE子句中使用函数会导致索引失效（如 WHERE YEAR(date)=2024）"
+      A: "若 B 为 REQUIRED：A 报错回滚，B 也会回滚（因为是同一个事务）。",
+      B: "若 B 为 REQUIRES_NEW：A 报错回滚，B 不会回滚（只要 B 执行成功）。",
+      C: "若 B 为 NESTED：B 报错回滚，A 可以选择捕获异常不回滚（B 是 A 的子事务/保存点）。",
+      D: "若 B 为 SUPPORTS：如果 A 没有事务，B 就会新建一个事务运行。",
     },
-    correctAnswer: ["A", "C", "D"],
+    correctAnswer: ["A","B","C"],
     abilityDimension: "database",
     difficulty: "medium",
     weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "A正确：高频查询列应该建索引。B错误：索引会增加写入开销和存储空间。C正确：满足最左前缀原则。D正确：函数会导致索引失效。"
+    applicableRoles: ["backend"],
+    applicableLanguages: ["Java"],
+    explanation: "A对：REQUIRED（默认）表示加入当前事务，同属一个事务单元。B对：REQUIRES_NEW会挂起A的事务，新建一个独立事务，B的事务提交后不受A回滚影响。C对：NESTED在A的事务内创建一个保存点，B回滚到此保存点，A可捕获异常决定是否继续。D错：SUPPORTS表示如果当前存在事务则加入，否则以非事务方式运行，不会新建事务。",
   },
   {
-    content: "关于数据库事务的隔离级别，以下哪些说法是正确的？（多选）",
+    content: "执行 Explain 查看 SQL 执行计划时，若 Extra 列出现了以下哪些关键词，通常意味着需要优化 SQL 或索引？",
     type: "multiple",
     options: {
-      A: "READ UNCOMMITTED会产生脏读",
-      B: "READ COMMITTED可以避免脏读",
-      C: "REPEATABLE READ可以避免幻读",
-      D: "SERIALIZABLE隔离级别最高但性能最差"
+      A: "Using index",
+      B: "Using filesort",
+      C: "Using temporary",
+      D: "Using index condition",
     },
-    correctAnswer: ["A", "B", "D"],
+    correctAnswer: ["B","C"],
     abilityDimension: "database",
     difficulty: "medium",
     weight: 1,
-    applicableRoles: ["backend", "fullstack"],
+    applicableRoles: ["backend"],
     applicableLanguages: null,
-    explanation: "READ UNCOMMITTED会产生脏读、不可重复读、幻读。READ COMMITTED避免脏读。REPEATABLE READ在标准SQL中不能完全避免幻读（MySQL InnoDB通过间隙锁解决）。SERIALIZABLE性能最差但隔离级别最高。"
+    explanation: "B/C对：Using filesort表示无法利用索引完成排序，需要在内存或磁盘进行额外排序，效率低。Using temporary表示需要创建临时表来处理查询（如GROUP BY、ORDER BY），可能消耗大量资源。A错：Using index表示使用了覆盖索引，是高效的表现。D错：Using index condition表示使用了索引下推（ICP），是优化特性。",
   },
   {
-    content: "在设计用户表时，以下哪些字段适合建立索引？（多选）",
+    content: "现有 Service A 调用 Service B。A 方法上有事务 @Transactional，B 方法上配置了不同的传播行为。下列场景描述正确的有？",
     type: "multiple",
     options: {
-      A: "user_id（主键）",
-      B: "email（唯一且常用于查询）",
-      C: "password（密码哈希）",
-      D: "created_at（创建时间，常用于排序）"
+      A: "若 B 为 REQUIRED：A 报错回滚，B 也会回滚（因为是同一个事务）。",
+      B: "若 B 为 REQUIRES_NEW：A 报错回滚，B 不会回滚（只要 B 执行成功）。",
+      C: "若 B 为 NESTED：B 报错回滚，A 可以选择捕获异常不回滚（B 是 A 的子事务/保存点）。",
+      D: "若 B 为 SUPPORTS：如果 A 没有事务，B 就会新建一个事务运行。",
     },
-    correctAnswer: ["A", "B", "D"],
+    correctAnswer: ["A","B","C"],
     abilityDimension: "database",
     difficulty: "medium",
     weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "主键自动建立索引。email常用于登录查询且唯一，应建索引。created_at常用于排序和范围查询，应建索引。password不用于查询条件，不应建索引。"
+    applicableRoles: ["backend"],
+    applicableLanguages: ["Java"],
+    explanation: "A对：REQUIRED（默认）表示加入当前事务，同属一个事务单元。B对：REQUIRES_NEW会挂起A的事务，新建一个独立事务，B的事务提交后不受A回滚影响。C对：NESTED在A的事务内创建一个保存点，B回滚到此保存点，A可捕获异常决定是否继续。D错：SUPPORTS表示如果当前存在事务则加入，否则以非事务方式运行，不会新建事务。",
   },
   {
-    content: "关于数据库的分库分表，以下哪些说法是正确的？（多选）",
+    content: "执行 Explain 查看 SQL 执行计划时，若 Extra 列出现了以下哪些关键词，通常意味着需要优化 SQL 或索引？",
     type: "multiple",
     options: {
-      A: "垂直分表是按照字段拆分表",
-      B: "水平分表是按照行数据拆分表",
-      C: "分库分表后可以解决所有性能问题",
-      D: "跨库JOIN查询会变得复杂"
+      A: "Using index",
+      B: "Using filesort",
+      C: "Using temporary",
+      D: "Using index condition",
     },
-    correctAnswer: ["A", "B", "D"],
+    correctAnswer: ["B","C"],
     abilityDimension: "database",
     difficulty: "medium",
     weight: 1,
-    applicableRoles: ["backend", "fullstack"],
+    applicableRoles: ["backend"],
     applicableLanguages: null,
-    explanation: "垂直分表按字段拆分（如用户基本信息表和扩展信息表）。水平分表按行拆分（如按用户ID哈希）。分库分表可以解决容量和性能问题，但不是万能的，且会增加系统复杂度。"
-  },
-  {
-    content: "以下关于NoSQL数据库的说法，哪些是正确的？（多选）",
-    type: "multiple",
-    options: {
-      A: "MongoDB适合存储文档型数据",
-      B: "Redis适合做持久化的主数据库",
-      C: "NoSQL数据库都不支持事务",
-      D: "NoSQL通常采用最终一致性模型"
-    },
-    correctAnswer: ["A", "D"],
-    abilityDimension: "database",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "MongoDB是文档数据库，适合存储JSON格式数据。Redis是内存数据库，不适合做主数据库。现代NoSQL（如MongoDB）支持事务。NoSQL通常采用最终一致性模型以提高性能和可用性。"
-  },
-  {
-    content: "你需要为一个在线教育平台设计数据库，核心业务包括：\\n- 用户系统（学生、教师）\\n- 课程系统（课程、章节、视频）\\n- 订单系统（购买记录、支付状态）\\n\\n请用150字以内描述你的数据库设计方案，至少包括：\\n1. 核心表结构及关系\\n2. 关键字段设计\\n3. 索引设计\\n4. 数据一致性保障",
-    type: "essay",
-    options: null,
-    correctAnswer: null,
-    abilityDimension: "database",
-    difficulty: "medium",
-    weight: 5,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "评分标准（总分5分）：\\n- 核心表结构设计合理（users、courses、chapters、videos、orders等）：1分\\n- 关键字段考虑周全（外键、状态字段、时间戳、软删除等）：1分\\n- 索引设计合理（主键、外键、查询条件字段）：1分\\n- 数据一致性考虑（事务、外键约束、状态机）：1分\\n- 方案整体合理性：1分",
-    referenceAnswer: "参考方案要点：\\n1. 核心表：users(id, role, email)、courses(id, teacher_id, title)、chapters(id, course_id, title, order)、videos(id, chapter_id, url)、orders(id, user_id, course_id, status, amount)\\n2. 关键字段：外键关联(teacher_id→users.id)、枚举状态(role: student/teacher, order.status: pending/paid/refunded)、时间戳(created_at, updated_at)、软删除(deleted_at)\\n3. 索引：主键索引、外键索引(teacher_id, course_id, user_id)、唯一索引(users.email)、联合索引(orders.user_id, orders.status)\\n4. 一致性：订单创建使用事务、外键约束保证数据完整性、订单状态使用状态机防止非法转换"
+    explanation: "B/C对：Using filesort表示无法利用索引完成排序，需要在内存或磁盘进行额外排序，效率低。Using temporary表示需要创建临时表来处理查询（如GROUP BY、ORDER BY），可能消耗大量资源。A错：Using index表示使用了覆盖索引，是高效的表现。D错：Using index condition表示使用了索引下推（ICP），是优化特性。",
   },
 
-  // 困难题（2题）
+  // 困难题（1题）
   {
-    content: "在数据库性能优化中，以下哪些措施是有效的？（多选）",
+    content: "你需要从数据库中导出所有 “下过订单的用户” 的姓名（即排除掉那些注册了但没买东西的人）。 现有两张表：用户表 users (字段：id, name) 和订单表 orders (字段：order_id, user_id, amount)。下列哪些 SQL 语句可以 正确 查出“在 orders 表中有记录的用户姓名”？",
     type: "multiple",
     options: {
-      A: "使用EXPLAIN分析查询计划",
-      B: "给所有列都建立索引",
-      C: "避免SELECT *，只查询需要的列",
-      D: "使用分页查询代替一次性加载所有数据"
+      A: "SELECT DISTINCT u.name FROM users u INNER JOIN orders o ON u.id = o.user_id;",
+      B: "SELECT u.name FROM users u LEFT JOIN orders o ON u.id = o.user_id WHERE o.order_id IS NULL;",
+      C: "SELECT name FROM users WHERE id IN (SELECT user_id FROM orders);",
+      D: "SELECT name FROM users u WHERE EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id);",
     },
-    correctAnswer: ["A", "C", "D"],
+    correctAnswer: ["A","C","D"],
     abilityDimension: "database",
     difficulty: "hard",
     weight: 1,
-    applicableRoles: ["backend", "fullstack"],
+    applicableRoles: ["frontend","backend","fullstack"],
     applicableLanguages: null,
-    explanation: "EXPLAIN可以分析查询计划找出性能瓶颈。给所有列建索引会严重影响写入性能。SELECT *会查询不需要的数据，浪费资源。分页查询可以减少内存占用和网络传输。"
-  },
-  {
-    content: "关于数据库的MVCC（多版本并发控制），以下哪些说法是正确的？（多选）",
-    type: "multiple",
-    options: {
-      A: "MVCC通过保存数据的多个版本来实现并发控制",
-      B: "MVCC可以实现读写不阻塞",
-      C: "PostgreSQL和MySQL InnoDB都使用MVCC",
-      D: "MVCC完全不需要锁机制"
-    },
-    correctAnswer: ["A", "B", "C"],
-    abilityDimension: "database",
-    difficulty: "hard",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "MVCC通过保存数据的多个版本实现快照读，使读写不阻塞。PostgreSQL和MySQL InnoDB都实现了MVCC。但MVCC不能完全替代锁，写写操作仍需要锁来避免冲突。"
-  },
-
-  // 新增：Java后端开发题目
-  {
-    content: "在 MySQL 中，执行 Select * from users where name like '% Jack'，索引会？",
-    type: "single",
-    options: {
-      A: "正常命中",
-      B: "失效（全表扫描）",
-      C: "部分命中",
-      D: "报错"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "database",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "LIKE 查询以通配符 % 开头会导致索引失效，触发全表扫描。"
+    explanation: "- A 对 (INNER JOIN)： 内连接只保留两张表中都有关联的数据，正好筛选出“下过单的用户”。(加 DISTINCT 是为了去重，因为一个用户可能下多单)。\n- B 错 (逻辑相反)： LEFT JOIN 会保留所有用户，而 WHERE o.order_id IS NULL 是筛选出“右边没数据的行”。所以这句话查出来的是**“没下过订单的用户”**，与题目要求完全相反。这是考察对 LEFT JOIN 结果集过滤的经典考点。\n- C 对 (IN)： 筛选 ID 在订单表里的用户，逻辑正确。\n- D 对 (EXISTS)： 只要订单表存在关联记录就返回，逻辑正确且性能较好。",
   }
 ];

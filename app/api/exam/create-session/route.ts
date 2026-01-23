@@ -159,8 +159,9 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     console.error("创建考试会话失败：", error);
+    const errorMessage = error instanceof Error ? error.message : "创建考试会话失败";
     return NextResponse.json(
-      { error: "创建考试会话失败" },
+      { error: errorMessage },
       { status: 500 }
     );
   }

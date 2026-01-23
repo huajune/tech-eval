@@ -13,6 +13,12 @@ export default {
     extend: {
       fontFamily: {
         sans: [
+          '"Source Han Sans CN"',
+          '"SourceHanSansCN"',
+          '"PingFang SC"',
+          '"Hiragino Sans GB"',
+          '"Microsoft YaHei"',
+          '"WenQuanYi Micro Hei"',
           "system-ui",
           "-apple-system",
           "BlinkMacSystemFont",

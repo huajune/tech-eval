@@ -37,21 +37,21 @@ export interface Question {
 }
 
 /**
- * 题目分布策略（总25题）：
- * - 代码设计：3易 + 2中 = 5题
- * - 软件架构：3易 + 2中 = 5题
- * - 数据库建模：3易 + 2中 = 5题
- * - 运维能力：3易 + 2中 = 5题
- * - QA测试：3易 + 2中 = 5题
+ * 题目分布策略（总15题）：
+ * - 代码设计：2易 + 1中 = 3题
+ * - 软件架构：2易 + 1中 = 3题
+ * - 数据库建模：2易 + 1中 = 3题
+ * - 运维能力：2易 + 1中 = 3题
+ * - QA测试：2易 + 1中 = 3题
  *
- * 总计：15易 + 10中 = 25题
+ * 总计：10易 + 5中 = 15题
  */
 const QUESTION_DISTRIBUTION = {
-  code_design: { easy: 3, medium: 2, hard: 0 },
-  architecture: { easy: 3, medium: 2, hard: 0 },
-  database: { easy: 3, medium: 2, hard: 0 },
-  devops: { easy: 3, medium: 2, hard: 0 },
-  qa_testing: { easy: 3, medium: 2, hard: 0 },
+  code_design: { easy: 2, medium: 1, hard: 0 },
+  architecture: { easy: 2, medium: 1, hard: 0 },
+  database: { easy: 2, medium: 1, hard: 0 },
+  devops: { easy: 2, medium: 1, hard: 0 },
+  qa_testing: { easy: 2, medium: 1, hard: 0 },
 } as const;
 
 /**
@@ -149,10 +149,14 @@ export async function generateExamQuestions(
 
     const grouped = groupQuestions(typedQuestions);
 
-    // 3. 按策略抽题（优先抽取简答题）
+    // 3. 按策略抽题（优先按分布，不足时从其他难度补全，确保总数15题）
     const selected: Question[] = [];
-    const errors: string[] = [];
+    const warnings: string[] = [];
+    const targetTotal = 15; // 目标总数
+    const targetEasy = 10; // 目标简单题数
+    const targetMedium = 5; // 目标中等题数
 
+    // 第一步：按维度优先抽取（每个维度3题：2易+1中）
     for (const [dimension, distribution] of Object.entries(
       QUESTION_DISTRIBUTION
     )) {
@@ -160,28 +164,122 @@ export async function generateExamQuestions(
         if (count > 0) {
           const pool = grouped[dimension]?.[difficulty] || [];
 
-          if (pool.length < count) {
-            // 题目不足，记录错误
-            errors.push(
-              `${dimension} - ${difficulty} 题目不足：需要${count}题，实际${pool.length}题`
+          if (pool.length === 0) {
+            // 完全没有题目，记录警告
+            warnings.push(
+              `${dimension} - ${difficulty} 无可用题目（需要${count}题）`
+            );
+          } else if (pool.length < count) {
+            // 题目不足，使用所有可用题目
+            warnings.push(
+              `${dimension} - ${difficulty} 题目不足：需要${count}题，实际${pool.length}题，将使用全部${pool.length}题`
             );
             selected.push(...pool);
           } else {
-            // 直接随机抽取，不强制区分题型
+            // 题目充足，随机抽取
             selected.push(...selectRandom(pool, count));
           }
         }
       }
     }
 
-    // 4. 如果有题目不足的情况，抛出错误终止会话创建
-    if (errors.length > 0) {
-      throw new Error(`题库不足，无法生成考试：\n${errors.join('\n')}`);
+    // 第二步：统计当前简单题和中等题数量
+    const currentEasy = selected.filter(q => q.difficulty === 'easy').length;
+    const currentMedium = selected.filter(q => q.difficulty === 'medium').length;
+    const currentTotal = selected.length;
+
+    // 第三步：如果总数不足15题，从其他难度补全
+    if (currentTotal < targetTotal) {
+      const needed = targetTotal - currentTotal;
+      
+      // 收集所有未选中的题目（按难度分组）
+      const selectedIds = new Set(selected.map(q => q.id));
+      const allEasy: Question[] = [];
+      const allMedium: Question[] = [];
+      
+      for (const dimension of Object.keys(QUESTION_DISTRIBUTION)) {
+        const easyPool = (grouped[dimension]?.easy || []).filter(q => !selectedIds.has(q.id));
+        const mediumPool = (grouped[dimension]?.medium || []).filter(q => !selectedIds.has(q.id));
+        allEasy.push(...easyPool);
+        allMedium.push(...mediumPool);
+      }
+
+      // 优先补全简单题到10题，然后补全中等题到5题，最后补全总数到15题
+      let remaining = needed;
+      
+      // 1. 如果简单题不足10题，先补简单题
+      if (currentEasy < targetEasy && allEasy.length > 0) {
+        const easyNeeded = Math.min(targetEasy - currentEasy, remaining, allEasy.length);
+        const additionalEasy = selectRandom(allEasy, easyNeeded);
+        selected.push(...additionalEasy);
+        remaining -= easyNeeded;
+        // 更新已选中的ID集合
+        additionalEasy.forEach(q => selectedIds.add(q.id));
+      }
+      
+      // 2. 如果中等题不足5题，补中等题（需要排除已选中的）
+      const currentMediumAfterEasy = selected.filter(q => q.difficulty === 'medium').length;
+      if (currentMediumAfterEasy < targetMedium && remaining > 0) {
+        const availableMedium = allMedium.filter(q => !selectedIds.has(q.id));
+        if (availableMedium.length > 0) {
+          const mediumNeeded = Math.min(targetMedium - currentMediumAfterEasy, remaining, availableMedium.length);
+          const additionalMedium = selectRandom(availableMedium, mediumNeeded);
+          selected.push(...additionalMedium);
+          remaining -= mediumNeeded;
+          // 更新已选中的ID集合
+          additionalMedium.forEach(q => selectedIds.add(q.id));
+        }
+      }
+      
+      // 3. 如果还需要更多题目，优先从简单题补，其次从中等题补
+      if (remaining > 0) {
+        // 更新可用题目列表（排除已选中的）
+        const availableEasy = allEasy.filter(q => !selectedIds.has(q.id));
+        const availableMedium = allMedium.filter(q => !selectedIds.has(q.id));
+        
+        // 优先从简单题补，如果简单题不够再从中等题补
+        if (availableEasy.length > 0) {
+          const easyToAdd = Math.min(remaining, availableEasy.length);
+          selected.push(...selectRandom(availableEasy, easyToAdd));
+          remaining -= easyToAdd;
+        }
+        
+        if (availableMedium.length > 0 && remaining > 0) {
+          const mediumToAdd = Math.min(remaining, availableMedium.length);
+          selected.push(...selectRandom(availableMedium, mediumToAdd));
+          remaining -= mediumToAdd;
+        }
+      }
+      
+      if (remaining > 0) {
+        warnings.push(`无法补全到15题：还缺少${remaining}题`);
+      }
     }
 
-    // 5. 验证题目数量（必须恰好25题）
-    if (selected.length !== 25) {
-      throw new Error(`题目数量错误：需要25题，实际生成${selected.length}题`);
+    // 第四步：记录警告信息
+    if (warnings.length > 0) {
+      console.warn(`题库部分不足：\n${warnings.join('\n')}`);
+    }
+
+    // 第五步：验证题目数量
+    const finalTotal = selected.length;
+    const finalEasy = selected.filter(q => q.difficulty === 'easy').length;
+    const finalMedium = selected.filter(q => q.difficulty === 'medium').length;
+    
+    console.log(`题目统计：总计${finalTotal}题（简单${finalEasy}题，中等${finalMedium}题）`);
+
+    const minRequiredQuestions = 10; // 最少需要10题才能开始考试
+    if (finalTotal < minRequiredQuestions) {
+      throw new Error(
+        `题目数量不足：需要至少${minRequiredQuestions}题才能开始考试，实际生成${finalTotal}题。\n` +
+        `请检查题库配置，确保有足够的题目。\n` +
+        `警告信息：\n${warnings.join('\n')}`
+      );
+    }
+    
+    // 如果题目数量少于15题，记录警告但不阻止
+    if (finalTotal < targetTotal) {
+      console.warn(`题目数量不足：期望${targetTotal}题，实际${finalTotal}题，将使用现有题目继续`);
     }
 
     // 6. 验证题目ID唯一性（防止重复）
@@ -219,8 +317,8 @@ export function validateQuestionDistribution(questions: Question[]): {
   const errors: string[] = [];
 
   // 检查总数
-  if (questions.length !== 25) {
-    errors.push(`题目总数应为25题，实际${questions.length}题`);
+  if (questions.length !== 15) {
+    errors.push(`题目总数应为15题，实际${questions.length}题`);
   }
 
   // 检查各维度题目数量
@@ -231,8 +329,8 @@ export function validateQuestionDistribution(questions: Question[]): {
   }
 
   for (const [dimension, count] of Object.entries(dimensionCounts)) {
-    if (count !== 5) {
-      errors.push(`${dimension}维度应为5题，实际${count}题`);
+    if (count !== 3) {
+      errors.push(`${dimension}维度应为3题，实际${count}题`);
     }
   }
 

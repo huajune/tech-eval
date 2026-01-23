@@ -1,1048 +1,349 @@
 import { SeedQuestion } from "./types";
 
 export const codeDesignQuestions: SeedQuestion[] = [
-  // 简单题（22题）
+  // 简单题（14题）
   {
-    content: "在React函数组件中，以下哪种方式最符合处理副作用的最佳实践？",
-    type: "single",
-    options: {
-      A: "const [data, setData] = useState(fetchData())",
-      B: "useEffect(() => { fetchData().then(setData) }, [])",
-      C: "const data = useMemo(() => fetchData(), [])",
-      D: "以上都不推荐"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "副作用（如数据获取）应该在useEffect中处理，避免在渲染过程中执行异步操作。选项A会在每次渲染时调用fetchData，选项C的useMemo用于计算派生值而非处理副作用。"
-  },
-  {
-    content: "以下关于JavaScript中const声明的说法，哪个是正确的？",
-    type: "single",
-    options: {
-      A: "const声明的对象属性不能被修改",
-      B: "const声明的变量不能被重新赋值",
-      C: "const声明的数组元素不能被修改",
-      D: "const声明会提升到作用域顶部并初始化为undefined"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "const声明的变量不能被重新赋值，但如果是对象或数组，其内部属性/元素仍可被修改。const声明存在暂时性死区，不会像var那样提升并初始化。"
-  },
-  {
-    content: "在TypeScript中，以下哪种方式可以正确定义一个只读数组类型？",
-    type: "single",
-    options: {
-      A: "const arr: number[] = [1, 2, 3]",
-      B: "const arr: readonly number[] = [1, 2, 3]",
-      C: "const arr: Array<number> = [1, 2, 3]",
-      D: "const arr: ReadonlyArray<number> = [1, 2, 3]"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "TypeScript中可以使用 readonly number[] 或 ReadonlyArray<number> 来定义只读数组。选项B和D都是正确的，但题目要求选择一个，B是更简洁的写法。"
-  },
-  {
-    content: "以下哪个React Hook可以在组件卸载时执行清理操作？",
-    type: "single",
-    options: {
-      A: "useEffect返回的清理函数",
-      B: "useLayoutEffect",
-      C: "useCallback",
-      D: "useMemo"
-    },
-    correctAnswer: ["A"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "useEffect可以返回一个清理函数，这个函数会在组件卸载时或下次effect执行前被调用，用于清理订阅、定时器等资源。"
-  },
-  {
-    content: "在Python中，以下哪种方式是推荐的字符串格式化方法（Python 3.6+）？",
-    type: "single",
-    options: {
-      A: "\"Hello %s\" % name",
-      B: "\"Hello {}\".format(name)",
-      C: "f\"Hello {name}\"",
-      D: "\"Hello \" + name"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["python"],
-    explanation: "f-string（格式化字符串字面量）是Python 3.6+推荐的字符串格式化方式，语法简洁且性能更好。"
-  },
-  {
-    content: "Java中，以下关于异常处理的说法哪个是正确的？",
-    type: "single",
-    options: {
-      A: "finally块一定会执行，即使try块中有return语句",
-      B: "catch块可以捕获所有类型的错误包括OutOfMemoryError",
-      C: "可以在finally块中使用return语句覆盖try块的返回值",
-      D: "必须捕获所有受检异常，否则程序无法编译"
-    },
-    correctAnswer: ["A"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["java"],
-    explanation: "finally块会在try-catch块执行完毕后必定执行，即使有return、break或continue语句。但在finally中使用return是不推荐的做法。"
-  },
-  {
-    content: "以下哪种情况适合使用React的useCallback Hook？",
-    type: "single",
-    options: {
-      A: "缓存复杂的计算结果",
-      B: "防止子组件不必要的重新渲染",
-      C: "管理组件的状态",
-      D: "执行副作用操作"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "useCallback用于缓存函数引用，避免在每次渲染时创建新的函数实例，特别是当函数作为props传递给使用React.memo优化的子组件时。"
-  },
-  {
-    content: "在TypeScript中，interface和type的主要区别是什么？",
-    type: "single",
-    options: {
-      A: "interface只能定义对象类型，type可以定义任何类型",
-      B: "interface不支持继承，type支持",
-      C: "type不能被重复声明，interface可以",
-      D: "没有本质区别，完全可以互换使用"
-    },
-    correctAnswer: ["A"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "interface主要用于定义对象类型且支持声明合并，type可以定义联合类型、交叉类型、原始类型别名等。interface支持extends继承，type使用交叉类型(&)实现类似功能。"
-  },
-  {
-    content: "Python中，以下哪种方式可以避免字典键不存在时抛出KeyError？",
-    type: "single",
-    options: {
-      A: "使用dict[key]访问",
-      B: "使用dict.get(key, default)访问",
-      C: "使用dict.keys()检查",
-      D: "使用dict.values()访问"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["python"],
-    explanation: "dict.get(key, default)方法在键不存在时返回默认值而不会抛出异常。也可以使用 key in dict 先检查键是否存在。"
-  },
-  {
-    content: "Java中，以下哪个集合类是线程安全的？",
-    type: "single",
-    options: {
-      A: "ArrayList",
-      B: "HashMap",
-      C: "ConcurrentHashMap",
-      D: "LinkedList"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["java"],
-    explanation: "ConcurrentHashMap是线程安全的，使用分段锁机制提高并发性能。ArrayList、HashMap和LinkedList都不是线程安全的。"
-  },
-  {
-    content: "在React中，以下哪种方式可以避免组件在props未变化时重新渲染？",
-    type: "single",
-    options: {
-      A: "使用shouldComponentUpdate",
-      B: "使用React.memo包裹函数组件",
-      C: "使用PureComponent",
-      D: "以上都可以"
-    },
-    correctAnswer: ["D"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "shouldComponentUpdate用于类组件，React.memo用于函数组件，PureComponent是内置浅比较的类组件基类。三者都可以通过比较props避免不必要的渲染。"
-  },
-  {
-    content: "以下关于JavaScript闭包的说法，哪个是正确的？",
-    type: "single",
-    options: {
-      A: "闭包会导致内存泄漏，应该避免使用",
-      B: "闭包可以访问外部函数的变量，即使外部函数已经返回",
-      C: "闭包只能在异步函数中使用",
-      D: "闭包必须使用箭头函数才能创建"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "闭包是指函数可以记住并访问其词法作用域，即使函数在其词法作用域之外执行。这是JavaScript的核心特性，合理使用不会导致内存泄漏。"
-  },
-  {
-    content: "在Next.js中，以下哪种方式可以创建动态路由？",
-    type: "single",
-    options: {
-      A: "pages/post-[id].tsx",
-      B: "pages/post/[id].tsx",
-      C: "pages/post/:id.tsx",
-      D: "pages/post/{id}.tsx"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "Next.js使用文件系统路由，动态路由段用方括号表示，如[id].tsx。放在目录下可以访问/post/123这样的URL。"
-  },
-  {
-    content: "TypeScript中，以下哪种方式可以定义一个可选属性？",
-    type: "single",
-    options: {
-      A: "name: string | null",
-      B: "name?: string",
-      C: "name: string = ''",
-      D: "name: string | undefined"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "问号(?)表示可选属性，相当于 name: string | undefined。与| null不同，可选属性可以完全不提供。"
-  },
-  {
-    content: "React中，useState的初始值如果是一个函数调用，会发生什么？",
-    type: "single",
-    options: {
-      A: "函数会在每次渲染时执行",
-      B: "函数只会在组件挂载时执行一次",
-      C: "会报错，useState不接受函数作为参数",
-      D: "函数会在组件更新时执行"
-    },
-    correctAnswer: ["A"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "useState(expensiveFunc())会在每次渲染时调用函数。如果初始值计算昂贵，应该使用惰性初始化：useState(() => expensiveFunc())。"
-  },
-  {
-    content: "在React中，以下关于key属性的说法，哪个是正确的？",
-    type: "single",
-    options: {
-      A: "key只是为了方便调试，对性能没有影响",
-      B: "可以使用数组索引作为key，这是最佳实践",
-      C: "key帮助React识别哪些元素改变了，从而优化渲染",
-      D: "key必须是数字类型"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "key帮助React识别列表中元素的变化，避免不必要的重新渲染。使用索引作为key在列表项顺序改变时会导致问题，应该使用稳定的唯一标识。"
-  },
-  {
-    content: "在Spring Boot中，以下关于依赖注入（Dependency Injection）的说法哪个是正确的？",
-    type: "single",
-    options: {
-      A: "@Autowired注解可以注入接口的实现类",
-      B: "必须使用XML配置才能实现依赖注入",
-      C: "依赖注入会降低代码性能，不建议使用",
-      D: "只能通过构造函数进行依赖注入"
-    },
-    correctAnswer: ["A"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["java"],
-    explanation: "@Autowired可以自动注入Spring容器中的Bean，包括接口的实现类。Spring Boot推荐使用注解配置而非XML。依赖注入是Spring的核心特性，提高了代码的可测试性和解耦性。虽然构造函数注入是推荐方式，但也支持字段注入和setter注入。"
-  },
-  {
-    content: "Java中，以下关于访问修饰符的说法哪个是正确的？",
-    type: "single",
-    options: {
-      A: "private成员可以被同一个包中的其他类访问",
-      B: "protected成员可以被不同包的子类访问",
-      C: "默认（无修饰符）成员可以被任何类访问",
-      D: "public成员只能在同一个类中访问"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["java"],
-    explanation: "Java访问修饰符范围：private（仅本类）< 默认/package-private（同包）< protected（同包+子类）< public（所有）。protected成员可以被同包类和不同包的子类访问。"
-  },
-  {
-    content: "在Java中，以下关于String类的说法哪个是正确的？",
-    type: "single",
-    options: {
-      A: "String对象是可变的，可以直接修改内容",
-      B: "使用+拼接大量字符串时性能最好",
-      C: "String对象存储在字符串常量池中，相同内容的字符串会共享同一个对象",
-      D: "String和StringBuilder性能完全相同"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["java"],
-    explanation: "String是不可变类，相同内容的字符串字面量会存储在字符串常量池中并共享。大量拼接应使用StringBuilder以避免创建多个临时对象。"
-  },
-  {
-    content: "Python中，以下关于列表（list）的说法哪个是正确的？",
-    type: "single",
-    options: {
-      A: "列表是不可变类型，不能修改元素",
-      B: "列表只能存储相同类型的元素",
-      C: "列表可以存储不同类型的元素，且支持动态增删",
-      D: "列表访问元素的时间复杂度是O(n)"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["python"],
-    explanation: "Python列表是可变的动态数组，可以存储不同类型的元素，支持append、remove等操作。访问元素通过索引是O(1)时间复杂度。"
-  },
-  {
-    content: "Python中，以下哪种方式可以正确定义一个函数的默认参数？",
-    type: "single",
-    options: {
-      A: "def func(x, y=[]): pass",
-      B: "def func(x, y=None): y = y or []",
-      C: "def func(x, y=None): y = y if y is not None else []",
-      D: "选项B和C都可以，但C更严谨"
-    },
-    correctAnswer: ["D"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["python"],
-    explanation: "避免使用可变对象（如[]、{}）作为默认参数，因为它们在函数定义时只创建一次。应该使用None作为默认值，然后在函数体内初始化。选项C更严谨，因为y=[]是合法参数而y or []会将其视为假值。"
-  },
-
-  // 中等题（8题）
-  {
-    content: "以下关于React Hooks的规则，哪些是正确的？（多选）",
-    type: "multiple",
-    options: {
-      A: "只能在函数组件的顶层调用Hooks",
-      B: "可以在条件语句中调用Hooks",
-      C: "可以在循环中调用Hooks",
-      D: "只能在React函数组件或自定义Hook中调用Hooks"
-    },
-    correctAnswer: ["A", "D"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "Hooks必须在函数顶层调用，不能在条件、循环或嵌套函数中调用，以确保每次渲染时Hooks的调用顺序一致。Hooks只能在React函数组件或自定义Hook中使用。"
-  },
-  {
-    content: "在设计RESTful API时，以下哪些HTTP方法是幂等的？（多选）",
-    type: "multiple",
-    options: {
-      A: "GET",
-      B: "POST",
-      C: "PUT",
-      D: "DELETE"
-    },
-    correctAnswer: ["A", "C", "D"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "GET、PUT、DELETE是幂等的，即多次执行相同请求的效果与执行一次相同。POST不是幂等的，每次调用都可能创建新资源。"
-  },
-  {
-    content: "Python中，以下哪些是正确的上下文管理器（context manager）使用场景？（多选）",
-    type: "multiple",
-    options: {
-      A: "文件操作",
-      B: "数据库连接",
-      C: "锁资源管理",
-      D: "数学计算"
-    },
-    correctAnswer: ["A", "B", "C"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["python"],
-    explanation: "上下文管理器（with语句）用于资源管理，确保资源被正确获取和释放。适用于文件、数据库连接、锁等需要清理的资源，不适合简单的数学计算。"
-  },
-  {
-    content: "Java中，以下关于Stream API的说法哪些是正确的？（多选）",
-    type: "multiple",
-    options: {
-      A: "Stream操作分为中间操作和终止操作",
-      B: "Stream可以被重复使用",
-      C: "并行Stream总是比顺序Stream快",
-      D: "Stream操作是惰性求值的"
-    },
-    correctAnswer: ["A", "D"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["java"],
-    explanation: "Stream操作分为中间操作（返回Stream）和终止操作（返回结果）。Stream是一次性的，不能重复使用。Stream使用惰性求值，只有在终止操作时才执行。并行Stream不一定更快，取决于数据量和操作复杂度。"
-  },
-  {
-    content: "在TypeScript中，以下哪些类型守卫（Type Guard）的方式是有效的？（多选）",
-    type: "multiple",
-    options: {
-      A: "使用typeof检查",
-      B: "使用instanceof检查",
-      C: "自定义类型谓词函数",
-      D: "使用in操作符检查属性"
-    },
-    correctAnswer: ["A", "B", "C", "D"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "TypeScript支持多种类型守卫方式：typeof用于原始类型，instanceof用于类实例，in用于检查属性，自定义类型谓词（如 is Type）用于复杂类型判断。"
-  },
-  {
-    content: "以下关于React的受控组件和非受控组件，哪些说法是正确的？（多选）",
-    type: "multiple",
-    options: {
-      A: "受控组件的值由React state管理",
-      B: "非受控组件使用ref访问DOM获取值",
-      C: "受控组件更符合React的数据流理念",
-      D: "非受控组件性能一定比受控组件好"
-    },
-    correctAnswer: ["A", "B", "C"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "受控组件的值由state管理，每次输入都会触发状态更新。非受控组件使用ref直接操作DOM。受控组件符合React单向数据流，但性能不一定比非受控组件差，取决于具体场景。"
-  },
-  {
-    content: "Python中，以下关于装饰器（Decorator）的说法哪些是正确的？（多选）",
-    type: "multiple",
-    options: {
-      A: "装饰器本质是一个返回函数的函数",
-      B: "可以给一个函数添加多个装饰器",
-      C: "装饰器会修改原函数的代码",
-      D: "@符号是装饰器的语法糖"
-    },
-    correctAnswer: ["A", "B", "D"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["python"],
-    explanation: "装饰器是接受函数并返回新函数的高阶函数。可以叠加多个装饰器。@decorator是语法糖，等价于 func = decorator(func)。装饰器不修改原函数代码，而是包装它。"
-  },
-  {
-    content: "Java中，以下关于Optional类的使用哪些是最佳实践？（多选）",
-    type: "multiple",
-    options: {
-      A: "使用Optional.of()包装可能为null的值",
-      B: "使用Optional.ofNullable()包装可能为null的值",
-      C: "避免在类字段中使用Optional",
-      D: "使用orElse()或orElseGet()提供默认值"
-    },
-    correctAnswer: ["B", "C", "D"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["java"],
-    explanation: "Optional.of()要求参数非空，ofNullable()可接受null。Optional不应用作类字段，主要用于方法返回值。orElse/orElseGet用于提供默认值，避免直接调用get()。"
-  },
-  {
-    content: "在Next.js中，你需要展示一个商品列表页面，数据每天更新一次。以下哪种数据获取方式最合适？",
-    type: "single",
-    options: {
-      A: "getServerSideProps - 每次请求都获取最新数据",
-      B: "getStaticProps with revalidate - 增量静态生成",
-      C: "useEffect客户端请求 - 在浏览器中获取数据",
-      D: "getStaticProps without revalidate - 构建时生成"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "数据每天更新一次，使用ISR(Incremental Static Regeneration)最合适，设置revalidate为86400秒。既保证了性能（静态页面），又能定期更新数据。SSR每次都请求浪费资源，纯静态无法更新，客户端请求SEO不友好。"
-  },
-  {
-    content: "以下关于React性能优化的说法，哪些是正确的？（多选）",
-    type: "multiple",
-    options: {
-      A: "useMemo用于缓存计算结果，避免重复计算",
-      B: "useCallback用于缓存函数引用，避免子组件不必要的渲染",
-      C: "应该给所有组件都包裹React.memo",
-      D: "使用React.lazy和Suspense可以实现代码分割"
-    },
-    correctAnswer: ["A", "B", "D"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "useMemo缓存计算结果，useCallback缓存函数引用，React.lazy实现懒加载。但不应该过度优化，给所有组件包裹memo会增加额外开销，应该针对性优化重渲染昂贵的组件。"
-  },
-  {
-    content: "TypeScript中，以下哪些工具类型的使用是正确的？（多选）",
-    type: "multiple",
-    options: {
-      A: "Partial<User>可以将User的所有属性变为可选",
-      B: "Pick<User, 'id' | 'name'>可以选择User的部分属性创建新类型",
-      C: "Omit<User, 'password'>可以排除User的password属性",
-      D: "Required<User>可以将User的所有可选属性变为必选"
-    },
-    correctAnswer: ["A", "B", "C", "D"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "所有选项都是TypeScript内置工具类型的正确用法。Partial使所有属性可选，Pick选择指定属性，Omit排除指定属性，Required使所有属性必选。"
-  },
-  {
-    content: "在React中，你有一个深层嵌套的组件树，多个子组件需要访问用户信息。以下哪种方式最合适？",
-    type: "single",
-    options: {
-      A: "通过props一层层传递下去",
-      B: "使用Context API共享数据",
-      C: "使用全局变量存储",
-      D: "每个组件独立请求用户信息"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "Context API专为解决props drilling（逐层传递）问题设计，适合共享全局数据如用户信息、主题、语言等。全局变量不响应式，独立请求浪费资源，props逐层传递维护困难。"
-  },
-  {
-    content: "以下关于TypeScript的类型推导，哪些说法是正确的？（多选）",
-    type: "multiple",
-    options: {
-      A: "const声明的原始类型变量会被推导为字面量类型",
-      B: "let声明的变量会被推导为更宽泛的类型",
-      C: "函数返回值类型通常可以自动推导",
-      D: "应该给所有变量都显式声明类型"
-    },
-    correctAnswer: ["A", "B", "C"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "const x = 'hello'推导为'hello'字面量类型，let x = 'hello'推导为string。函数返回值通常能正确推导。但不需要给所有变量显式声明类型，过度标注反而降低可读性，应该利用类型推导。"
-  },
-  {
-    content: "你在开发一个自定义Hook用于获取API数据，需要处理加载、错误、数据三种状态。以下哪种设计最合理？",
-    type: "single",
-    options: {
-      A: "返回三个独立的state：[data, isLoading, error]",
-      B: "返回一个对象：{ data, isLoading, error, refetch }",
-      C: "只返回data，把loading和error存在全局state",
-      D: "使用throw抛出错误，不返回error状态"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "返回对象形式最灵活，支持解构和重命名。还可以包含refetch等额外方法。数组形式对于多个同类hook使用不便，全局状态管理过度，抛出错误破坏了声明式编程。"
-  },
-  {
-    content: "关于Next.js的Image组件，以下哪些说法是正确的？（多选）",
-    type: "multiple",
-    options: {
-      A: "自动优化图片大小和格式（如WebP）",
-      B: "支持懒加载，提升页面性能",
-      C: "必须指定width和height属性",
-      D: "可以使用placeholder属性显示模糊占位图"
-    },
-    correctAnswer: ["A", "B", "D"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "Next.js Image组件自动优化图片、支持懒加载和模糊占位图。width和height不是必须的，使用fill布局时可以不指定，但指定尺寸可以避免布局偏移(CLS)。"
-  },
-
-  // 新增：Java后端开发题目
-  {
-    content: "Java 中 String s = new String (\"xyz\"); 创建了几个对象？",
-    type: "single",
-    options: {
-      A: "1 个",
-      B: "2 个 (如果常量池中没有 \"xyz\")",
-      C: "3 个",
-      D: "0 个"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["java"],
-    explanation: "一个是常量池中的 \"xyz\"，一个是堆中的 String 对象。"
-  },
-  {
-    content: "需要存储键值对，且要求按插入顺序遍历，应选择哪个集合？",
-    type: "single",
-    options: {
-      A: "HashMap",
-      B: "TreeMap",
-      C: "LinkedHashMap",
-      D: "Hashtable"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["java"],
-    explanation: "LinkedHashMap 维护了插入顺序，HashMap 无序，TreeMap 按 Key 排序。"
-  },
-  {
-    content: "线程池 ThreadPoolExecutor 的核心参数中，maximumPoolSize 是指？",
-    type: "single",
-    options: {
-      A: "核心线程数",
-      B: "任务队列的容量",
-      C: "线程池允许创建的最大线程数",
-      D: "线程空闲存活时间"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["java"],
-    explanation: "maximumPoolSize 是线程池中允许的最大线程数，当队列满了且线程数小于该值时会创建新线程。"
-  },
-  {
-    content: "客户端请求接口收到 HTTP 403 Forbidden 状态码，通常意味着？",
-    type: "single",
-    options: {
-      A: "接口地址写错了",
-      B: "服务器内部报错",
-      C: "认证通过，但没有权限访问该资源",
-      D: "请求参数格式错误"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "403 Forbidden 表示服务器理解请求但拒绝执行，通常是因为权限不足。"
-  },
-  {
-    content: "线上出现 Bug，日志显示是 NullPointerException，但定位的代码行看起来不可能为空，你首先怀疑？",
-    type: "single",
-    options: {
-      A: "JVM 出问题了",
-      B: "线上运行的代码版本和本地看到的代码版本不一致",
-      C: "也是没办法，重启试试",
-      D: "编译器优化的锅"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["java"],
-    explanation: "代码版本不一致是导致看似不可能的空指针异常的常见原因。"
-  },
-  {
-    content: "需求评审会上，你发现产品经理的一个需求逻辑上有死循环风险，你应该？",
-    type: "single",
-    options: {
-      A: "会后私下告诉开发组长",
-      B: "当场提出，并用具体数据或场景演示这个死循环是如何发生的",
-      C: "不说话，等开发的时候再问",
-      D: "觉得产品经理不专业，心里嘲笑他"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "及时、专业地指出风险并提供证据是高效协作的体现。"
-  },
-  {
-    content: "测试在群里说你的接口报错了，但你自测是好的，你最好的回复是？",
-    type: "single",
-    options: {
-      A: "我这里好的，你检查下你的环境。",
-      B: "报错截图发我看下，还有入参是什么？",
-      C: "不可能，我测过好几遍了。",
-      D: "不回复，默默去查日志。"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "索要具体信息（截图、入参）是解决问题的有效第一步，体现了解决问题的态度。"
-  },
-  {
-    content: "周五临下班，领导突然塞给你一个紧急但不难的任务，需要 2 小时，你会？",
-    type: "single",
-    options: {
-      A: "直接拒绝，说下周一做。",
-      B: "默默做完，心里很不爽。",
-      C: "快速评估影响，确认必须今天做后，告知领导进度，做完再走，并申请调休或记录工时。",
-      D: "随便做做应付一下。"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "专业地评估、沟通并执行，同时维护自己的权益。"
-  },
-  {
-    content: "接手一个没有任何文档的老旧项目，代码非常乱，你需要修改一个功能，最高效的切入点是？",
-    type: "single",
-    options: {
-      A: "通读所有代码",
-      B: "找到该功能的入口接口，通过日志或断点，通过一条完整的请求链路来梳理逻辑",
-      C: "找以前的离职员工问",
-      D: "拒绝修改"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "通过入口追踪请求链路是理解遗留代码最直接有效的方法。"
-  },
-  {
-    content: "两个线程同时执行 i++ (i 初始为 0) 各 100 次，最终 i 的结果可能是？",
-    type: "single",
-    options: {
-      A: "一定是 200",
-      B: "一定小于 200",
-      C: "可能是 200，也可能小于 200",
-      D: "报错"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["java"],
-    explanation: "i++ 不是原子操作，多线程并发下可能出现覆盖写入，导致结果小于 200，但也可能运气好正好是 200。"
-  },
-  {
-    content: "系统频繁发生 Full GC，导致系统卡顿，以下哪个原因 最不可能？",
-    type: "single",
-    options: {
-      A: "内存泄漏，大量对象无法回收",
-      B: "System.gc () 被显式频繁调用",
-      C: "大对象直接进入老年代，且老年代空间不足",
-      D: "新生代设置得太大"
-    },
-    correctAnswer: ["D"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["backend", "fullstack"],
-    applicableLanguages: ["java"],
-    explanation: "新生代设置得大通常会减少对象晋升到老年代的频率，从而减少 Full GC。其他选项都可能导致 Full GC。"
-  },
-
-  // 新增：前端开发题目
-  {
-    content: "以下哪个 CSS 属性不属于盒子模型（Box Model）的组成部分？",
-    type: "single",
-    options: {
-      A: "Margin",
-      B: "Padding",
-      C: "Border",
-      D: "Position"
-    },
-    correctAnswer: ["D"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "盒子模型由 Content, Padding, Border, Margin 组成。Position 是定位属性。"
-  },
-  {
-    content: "console.log (1 + '2') 和 console.log (1 - '2') 的结果分别是？",
-    type: "single",
-    options: {
-      A: "\"12\", -1",
-      B: "3, -1",
-      C: "\"12\", NaN",
-      D: "3, NaN"
-    },
-    correctAnswer: ["A"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "加号遇到字符串会进行拼接 ('12')，减号会尝试将字符串转为数字进行运算 (-1)。"
-  },
-  {
-    content: "下列关于箭头函数 => 的说法，错误的是？",
-    type: "single",
-    options: {
-      A: "箭头函数没有自己的 this",
-      B: "箭头函数不能作为构造函数（不能 new）",
-      C: "箭头函数没有 arguments 对象",
-      D: "箭头函数可以改变 this 指向（通过 call/apply）"
-    },
-    correctAnswer: ["D"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "箭头函数的 this 是在定义时绑定的（词法作用域），无法通过 call/apply/bind 改变。"
-  },
-  {
-    content: "React/Vue 中，组件生命周期 Mount (挂载) 完成后，通常适合做什么？",
-    type: "single",
-    options: {
-      A: "定义 State 初始值",
-      B: "发送网络请求获取数据",
-      C: "销毁定时器",
-      D: "校验 Props 类型"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "Mount 完成意味着 DOM 已存在，是发送网络请求和操作 DOM 的标准时机。"
-  },
-  {
-    content: "浏览器跨域（CORS）限制主要针对的是？",
-    type: "single",
-    options: {
-      A: "CSS 文件的加载",
-      B: "Script 标签的 src 加载",
-      C: "Ajax/Fetch 网络请求",
-      D: "图片的 src 加载"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "同源策略主要限制脚本发起的跨域 HTTP 请求（如 Ajax/Fetch）。CSS、Script 标签、图片等通常允许跨域加载。"
-  },
-  {
-    content: "页面白屏，控制台没有任何报错，网络请求也都 200，你首先怀疑？",
-    type: "single",
-    options: {
-      A: "浏览器坏了",
-      B: "这是一个 CSS 问题（如高度 0 或内容被遮挡）",
-      C: "接口返回的数据为空，但前端没有做空状态处理",
-      D: "B 和 C 都有可能"
-    },
-    correctAnswer: ["D"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "无报错白屏通常是渲染层面的问题（CSS）或逻辑层面对空数据的处理不当。"
-  },
-  {
-    content: "UI 给的设计稿在手机上展示时，文字因为太长换行了，导致布局错位，你应该？",
-    type: "single",
-    options: {
-      A: "按照 UI 做，错位就错位，反正不是我的锅",
-      B: "自己做主把字号改小",
-      C: "联系 UI 和产品，确认是 \"截断并显示省略号\" 还是 \"允许换行并调整高度\"",
-      D: "删掉多余的文字"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "遇到设计与实际内容的冲突，应主动沟通确认解决方案，而不是擅自修改或忽略。"
-  },
-  {
-    content: "后端接口迟迟没好，严重影响你的开发进度，你会？",
-    type: "single",
-    options: {
-      A: "坐在那里玩手机等接口",
-      B: "催一下后端，然后继续等",
-      C: "约定好数据结构，先用 Mock 数据把前端逻辑写好",
-      D: "跟领导告状"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "使用 Mock 数据并行开发是解决前后端依赖的专业做法。"
-  },
-  {
-    content: "用户反馈 \"点按钮没反应\"，你应该问用户什么最关键的信息来帮助复现？",
-    type: "single",
-    options: {
-      A: "\"你是不是网不好？\"",
-      B: "\"你用的什么手机 / 浏览器？能截个图或录个屏吗？\"",
-      C: "\"多点几次试试？\"",
-      D: "\"重启一下试试？\""
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "环境信息（设备、浏览器）和视觉反馈（截图/录屏）是复现前端问题的关键。"
-  },
-  {
-    content: "移动端 H5 页面滚动卡顿，以下哪个优化方向通常是错误的？",
-    type: "single",
-    options: {
-      A: "减少 DOM 节点数量",
-      B: "使用 transform 代替 top/left 进行定位动画",
-      C: "将所有图片都转成 Base64 以减少请求",
-      D: "对长列表使用虚拟滚动 (Virtual List)"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "大图片转 Base64 会显著增加 CSS/JS 文件体积，阻塞解析，且无法利用浏览器缓存，反而可能导致页面卡顿。"
-  },
-  {
-    content: "代码 Review 时，同事指出你的命名不规范，但你觉得你的命名更准确，你会？",
-    type: "single",
-    options: {
-      A: "据理力争，坚决不改",
-      B: "表面答应，实际不改",
-      C: "参考团队现有的命名规范，如果规范未定义，则与团队讨论达成一致",
-      D: "说是 AI 写的"
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "code_design",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend", "backend", "fullstack"],
-    applicableLanguages: null,
-    explanation: "团队规范优于个人偏好，通过讨论达成一致是解决分歧的正确方式。"
-  },
-  {
-    content: "为什么 React/Vue 更新 DOM 时要使用 Virtual DOM（虚拟 DOM）？",
-    type: "single",
-    options: {
-      A: "因为虚拟 DOM 操作比原生 DOM 操作更快",
-      B: "为了跨平台能力，且通过 Diff 算法减少不必要的真实 DOM 重绘与回流",
-      C: "为了代码写起来更短",
-      D: "因为浏览器不再支持原生 DOM 操作"
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "code_design",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "虚拟 DOM 的核心价值在于跨平台抽象和批量更新（Batch Update）以减少真实 DOM 操作，并非在所有场景下都比原生快。"
-  },
-  {
-    content: "下面代码输出什么？for (var i = 0; i < 3; i++) { setTimeout(() => console.log(i), 1); }",
+    content: "运行以下代码，控制台输出的结果是？\nfor (var i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i), 0);\n}",
     type: "single",
     options: {
       A: "0 1 2",
       B: "3 3 3",
-      C: "2 2 2",
-      D: "报错"
+      C: "0 0 0",
+      D: "1 2 3",
     },
     correctAnswer: ["B"],
     abilityDimension: "code_design",
-    difficulty: "medium",
+    difficulty: "easy",
     weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
-    applicableLanguages: ["typescript"],
-    explanation: "var 声明的变量具有函数作用域，循环结束后 i 变为 3。setTimeout 回调执行时访问的是同一个 i，因此输出 3 个 3。"
+    applicableRoles: ["frontend"],
+    applicableLanguages: null,
+    explanation: "由于var声明的变量i是函数作用域，循环结束后i的值变为3。setTimeout是异步宏任务，其中的箭头函数在同步代码执行完后才执行，此时它们共享同一个变量i，因此输出三个3。",
   },
   {
-    content: "网页性能指标中，LCP (Largest Contentful Paint) 代表什么？",
+    content: "下列关于 z-index 不生效的原因，哪项是错误的？",
     type: "single",
     options: {
-      A: "首次绘制时间",
-      B: "页面完全加载时间",
-      C: "视口中最大的内容元素渲染完成的时间",
-      D: "用户首次交互的延迟时间"
+      A: "父元素设置了 overflow: hidden",
+      B: "元素本身没有设置 position (或为 static)",
+      C: "父元素的 z-index 比兄弟元素的 z-index 小，导致子元素无法突破父级层叠上下文",
+      D: "元素的 display 设置为了 block",
+    },
+    correctAnswer: ["D"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend"],
+    applicableLanguages: null,
+    explanation: "z-index属性仅对定位元素（position值不为static的元素）生效。display: block是正常的块级显示，不会影响z-index的生效。A、B、C三项都是导致z-index失效的常见原因。",
+  },
+  {
+    content: "在 React 中，key 属性的主要作用是？",
+    type: "single",
+    options: {
+      A: "设置 CSS 样式 ID",
+      B: "在 Virtual DOM Diff 算法中唯一标识节点，提高更新性能",
+      C: "绑定事件监听器",
+      D: "用于全局状态管理",
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend"],
+    applicableLanguages: null,
+    explanation: "key属性帮助React识别列表中哪些元素被改变、添加或删除，从而在Diff算法中高效地复用和更新节点，是提升列表渲染性能的关键。",
+  },
+  {
+    content: "下列代码输出顺序正确的是？\nconsole.log(1);\nnew Promise(resolve => {\n    console.log(2);\n    resolve();\n}).then(() => {\n    console.log(3);\n});\nconsole.log(4);",
+    type: "single",
+    options: {
+      A: "1 -> 2 -> 3 -> 4",
+      B: "1 -> 2 -> 4 -> 3",
+      C: "1 -> 4 -> 2 -> 3",
+      D: "1 -> 4 -> 3 -> 2",
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend"],
+    applicableLanguages: null,
+    explanation: "Promise构造函数是同步执行的，立即输出2。then回调属于微任务，会被推入微任务队列，等待当前同步任务（输出4）执行完毕后，再从微任务队列中取出执行，因此输出3。",
+  },
+  {
+    content: "Vue 2.x 响应式原理的核心是基于哪个 API 实现的？",
+    type: "single",
+    options: {
+      A: "Proxy",
+      B: "Object.defineProperty",
+      C: "EventTarget",
+      D: "Dirty Checking (脏检查)",
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend"],
+    applicableLanguages: null,
+    explanation: "Vue 2.x 通过Object.defineProperty劫持对象属性的getter和setter，实现数据变化的追踪和视图更新。Vue 3.x 改用Proxy实现，具有更好的性能和功能。",
+  },
+  {
+    content: "typeof null 的结果是？",
+    type: "single",
+    options: {
+      A: "\"null\"",
+      B: "\"undefined\"",
+      C: "\"object\"",
+      D: "\"number\"",
     },
     correctAnswer: ["C"],
     abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["frontend"],
+    applicableLanguages: null,
+    explanation: "typeof null 返回 \"object\" 是JavaScript语言的一个历史遗留Bug，其原理与早期JavaScript中值的二进制表示有关。这并非表示null是一个对象。",
+  },
+  {
+    content: "关于 Java 的 HashMap 扩容机制（JDK1.8+），下列说法正确的是？",
+    type: "single",
+    options: {
+      A: "只要元素个数超过数组长度就会扩容",
+      B: "扩容时，原数组中的元素会重新计算 Hash 值并均匀打散到新数组中",
+      C: "当链表长度大于 8 且数组长度大于 64 时，链表会转为红黑树",
+      D: "扩容是线程安全的",
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend"],
+    applicableLanguages: ["Java"],
+    explanation: "C对：这是JDK1.8引入的优化，防止链表过长导致查询效率下降。A错：需要超过负载因子（默认为0.75）与数组长度的乘积才会扩容。B错：JDK1.8通过高位运算确定元素在新数组中的位置，不需要重新计算Hash值。D错：HashMap非线程安全，多线程扩容可能导致死循环或数据丢失。",
+  },
+  {
+    content: "ThreadLocal 可能会导致内存泄漏，其主要原因是？",
+    type: "single",
+    options: {
+      A: "ThreadLocal 对象本身太大",
+      B: "ThreadLocalMap 的 Key 是弱引用，但 Value 是强引用，线程不结束 Value 就不回收",
+      C: "多个线程共享了同一个 ThreadLocal",
+      D: "频繁进行 set 操作",
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend"],
+    applicableLanguages: ["Java"],
+    explanation: "B对：ThreadLocalMap的Key（ThreadLocal实例）是弱引用，当ThreadLocal外部强引用消失后，Key会被GC回收，但对应的Value是强引用，若线程不结束（如线程池复用）且未调用remove()，Value将无法回收，导致内存泄漏。A/C/D错：与内存泄漏的核心原理无关。",
+  },
+  {
+    content: "关于 #{} 和 ${} 的区别，正确的是？",
+    type: "single",
+    options: {
+      A: "${} 是预编译，更安全",
+      B: "#{} 会直接进行字符串替换，存在注入风险",
+      C: "#{} 使用 PreparedStatement 预编译，可防止 SQL 注入",
+      D: "两者性能没有区别",
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend"],
+    applicableLanguages: ["Java"],
+    explanation: "C对：#{}是预编译占位符，MyBatis会将其替换为?，通过PreparedStatement设置参数，可有效防止SQL注入。A/B错：事实完全相反，${}是字符串拼接，存在注入风险。D错：#{}通常有预编译开销，但更安全，性能差异在可接受范围。",
+  },
+  {
+    content: "Spring 源码中 JdbcTemplate 使用了哪种设计模式来处理数据库连接的打开和关闭，让用户只关注 SQL 逻辑？",
+    type: "single",
+    options: {
+      A: "策略模式",
+      B: "模板方法模式 (Template Method)",
+      C: "观察者模式",
+      D: "装饰器模式",
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend"],
+    applicableLanguages: ["Java"],
+    explanation: "B对：模板方法模式定义了算法骨架（如获取连接、执行SQL、释放连接），将可变步骤（具体的SQL执行逻辑）延迟到子类或通过回调实现。JdbcTemplate的execute、query等方法正是此模式的典型应用。A/C/D错：在JdbcTemplate的核心流程中不体现这些模式。",
+  },
+  {
+    content: "关于 Java 的 HashMap 扩容机制（JDK1.8+），下列说法正确的是？",
+    type: "single",
+    options: {
+      A: "只要元素个数超过数组长度就会扩容",
+      B: "扩容时，原数组中的元素会重新计算 Hash 值并均匀打散到新数组中",
+      C: "当链表长度大于 8 且数组长度大于 64 时，链表会转为红黑树",
+      D: "扩容是线程安全的",
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend"],
+    applicableLanguages: ["Java"],
+    explanation: "C对：这是JDK1.8引入的优化，防止链表过长导致查询效率下降。A错：需要超过负载因子（默认为0.75）与数组长度的乘积才会扩容。B错：JDK1.8通过高位运算确定元素在新数组中的位置，不需要重新计算Hash值。D错：HashMap非线程安全，多线程扩容可能导致死循环或数据丢失。",
+  },
+  {
+    content: "ThreadLocal 可能会导致内存泄漏，其主要原因是？",
+    type: "single",
+    options: {
+      A: "ThreadLocal 对象本身太大",
+      B: "ThreadLocalMap 的 Key 是弱引用，但 Value 是强引用，线程不结束 Value 就不回收",
+      C: "多个线程共享了同一个 ThreadLocal",
+      D: "频繁进行 set 操作",
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend"],
+    applicableLanguages: ["Java"],
+    explanation: "B对：ThreadLocalMap的Key（ThreadLocal实例）是弱引用，当ThreadLocal外部强引用消失后，Key会被GC回收，但对应的Value是强引用，若线程不结束（如线程池复用）且未调用remove()，Value将无法回收，导致内存泄漏。A/C/D错：与内存泄漏的核心原理无关。",
+  },
+  {
+    content: "关于 #{} 和 ${} 的区别，正确的是？",
+    type: "single",
+    options: {
+      A: "${} 是预编译，更安全",
+      B: "#{} 会直接进行字符串替换，存在注入风险",
+      C: "#{} 使用 PreparedStatement 预编译，可防止 SQL 注入",
+      D: "两者性能没有区别",
+    },
+    correctAnswer: ["C"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend"],
+    applicableLanguages: ["Java"],
+    explanation: "C对：#{}是预编译占位符，MyBatis会将其替换为?，通过PreparedStatement设置参数，可有效防止SQL注入。A/B错：事实完全相反，${}是字符串拼接，存在注入风险。D错：#{}通常有预编译开销，但更安全，性能差异在可接受范围。",
+  },
+  {
+    content: "Spring 源码中 JdbcTemplate 使用了哪种设计模式来处理数据库连接的打开和关闭，让用户只关注 SQL 逻辑？",
+    type: "single",
+    options: {
+      A: "策略模式",
+      B: "模板方法模式 (Template Method)",
+      C: "观察者模式",
+      D: "装饰器模式",
+    },
+    correctAnswer: ["B"],
+    abilityDimension: "code_design",
+    difficulty: "easy",
+    weight: 1,
+    applicableRoles: ["backend"],
+    applicableLanguages: ["Java"],
+    explanation: "B对：模板方法模式定义了算法骨架（如获取连接、执行SQL、释放连接），将可变步骤（具体的SQL执行逻辑）延迟到子类或通过回调实现。JdbcTemplate的execute、query等方法正是此模式的典型应用。A/C/D错：在JdbcTemplate的核心流程中不体现这些模式。",
+  },
+
+  // 中等题（2题）
+  {
+    content: "关于 useEffect 的依赖数组，以下描述正确的有？",
+    type: "multiple",
+    options: {
+      A: "如果依赖数组为空 []，回调函数只会在组件挂载（Mount）时执行一次。",
+      B: "如果不传依赖数组（省略参数），回调函数会在每次组件渲染（Render）后都执行。",
+      C: "如果依赖数组中的对象引用发生了变化，即使对象内容没变，也会触发回调。",
+      D: "useEffect 的回调函数可以是 async 函数（如 useEffect(async () => {...})）。",
+    },
+    correctAnswer: ["A","B","C"],
+    abilityDimension: "code_design",
     difficulty: "medium",
     weight: 1,
-    applicableRoles: ["frontend", "fullstack"],
+    applicableRoles: ["frontend"],
     applicableLanguages: null,
-    explanation: "LCP 衡量页面主要内容加载完成的时间点，是 Core Web Vitals 的重要指标。"
+    explanation: "D错：useEffect的回调函数不能直接声明为async，因为async函数返回Promise，而useEffect期望返回一个清理函数（或什么都不返回）。如需使用async/await，应在回调函数内部定义一个并立即调用。",
+  },
+  {
+    content: "关于\"重排（Reflow）\"和\"重绘（Repaint）\"，下列说法正确的是？",
+    type: "multiple",
+    options: {
+      A: "重排（Reflow）一定会触发重绘（Repaint）。",
+      B: "重绘（Repaint）一定会触发重排（Reflow）。",
+      C: "修改元素的 color、visibility 只会触发重绘。",
+      D: "修改元素的 width、margin、font-size 会触发重排。",
+    },
+    correctAnswer: ["A","C","D"],
+    abilityDimension: "code_design",
+    difficulty: "medium",
+    weight: 1,
+    applicableRoles: ["frontend"],
+    applicableLanguages: null,
+    explanation: "B错：重绘是重新绘制元素的外观，不涉及几何属性的改变，因此不会触发重排。A对：重排意味着布局发生了变化，需要重新计算，之后必然要重绘。C/D对：修改颜色、可见性等不影响布局的属性，只会触发重绘；而修改尺寸、边距、字体等影响布局的属性，会触发重排。",
+  },
+
+  // 困难题（4题）
+  {
+    content: "在单页应用（SPA）中，以下哪些场景如果不手动清理，可能会导致内存泄漏？",
+    type: "multiple",
+    options: {
+      A: "在 window 全局对象上挂载了大量数据。",
+      B: "setInterval 定时器没有被 clearInterval。",
+      C: "给 DOM 元素绑定了事件，元素被移除了，但事件监听器没解绑。",
+      D: "使用了闭包（Closure）引用了大量外部变量且长期持有。",
+    },
+    correctAnswer: ["A","B","C","D"],
+    abilityDimension: "code_design",
+    difficulty: "hard",
+    weight: 1,
+    applicableRoles: ["frontend"],
+    applicableLanguages: null,
+    explanation: "以上均为常见的内存泄漏场景。A：全局变量会一直存在直到页面关闭。B：定时器持有回调引用，阻止其被回收。C：被移除的DOM元素如果被事件监听器引用，则无法被GC回收。D：闭包会持有外部词法环境的引用，若闭包生命周期很长，其引用的外部变量也无法被释放。",
+  },
+  {
+    content: "关于 Event Loop，以下代码的执行顺序描述中，哪些属于\"微任务 (Microtask)\"？",
+    type: "multiple",
+    options: {
+      A: "Promise.then / catch / finally",
+      B: "setTimeout",
+      C: "process.nextTick (Node.js 环境)",
+      D: "MutationObserver",
+    },
+    correctAnswer: ["A","C","D"],
+    abilityDimension: "code_design",
+    difficulty: "hard",
+    weight: 1,
+    applicableRoles: ["frontend"],
+    applicableLanguages: null,
+    explanation: "在浏览器环境中，微任务主要包括Promise回调、MutationObserver等。Node.js环境特有process.nextTick（其优先级甚至高于Promise微任务）。B项setTimeout属于宏任务(Macrotask)。",
+  },
+  {
+    content: "关于 Java 线程池 ThreadPoolExecutor 的执行流程，下列描述正确的有？",
+    type: "multiple",
+    options: {
+      A: "当当前线程数 < corePoolSize 时，来新任务会直接创建新线程。",
+      B: "当当前线程数 >= corePoolSize 时，新任务会优先放入 workQueue 队列。",
+      C: "当队列满了，且当前线程数 < maximumPoolSize 时，会创建新线程处理任务。",
+      D: "当队列满了，且线程数也达到了 maximumPoolSize，会执行拒绝策略（Reject）。",
+    },
+    correctAnswer: ["A","B","C","D"],
+    abilityDimension: "code_design",
+    difficulty: "hard",
+    weight: 1,
+    applicableRoles: ["backend"],
+    applicableLanguages: ["Java"],
+    explanation: "这四点完整描述了ThreadPoolExecutor的标准任务处理流程：1）先判断核心线程数；2）核心线程满则入队；3）队列满则判断最大线程数；4）两者皆满则触发拒绝策略。顺序符合源码逻辑。",
+  },
+  {
+    content: "关于 Java 线程池 ThreadPoolExecutor 的执行流程，下列描述正确的有？",
+    type: "multiple",
+    options: {
+      A: "当当前线程数 < corePoolSize 时，来新任务会直接创建新线程。",
+      B: "当当前线程数 >= corePoolSize 时，新任务会优先放入 workQueue 队列。",
+      C: "当队列满了，且当前线程数 < maximumPoolSize 时，会创建新线程处理任务。",
+      D: "当队列满了，且线程数也达到了 maximumPoolSize，会执行拒绝策略（Reject）。",
+    },
+    correctAnswer: ["A","B","C","D"],
+    abilityDimension: "code_design",
+    difficulty: "hard",
+    weight: 1,
+    applicableRoles: ["backend"],
+    applicableLanguages: ["Java"],
+    explanation: "这四点完整描述了ThreadPoolExecutor的标准任务处理流程：1）先判断核心线程数；2）核心线程满则入队；3）队列满则判断最大线程数；4）两者皆满则触发拒绝策略。顺序符合源码逻辑。",
   }
 ];

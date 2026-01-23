@@ -33,7 +33,7 @@ async function seed() {
         framework: "nextjs",
         durationMinutes: 10,
         passingScore: 60,
-        totalQuestions: 25,
+        totalQuestions: 15,
         isActive: true,
       },
       {
@@ -44,7 +44,7 @@ async function seed() {
         framework: "react",
         durationMinutes: 10,
         passingScore: 60,
-        totalQuestions: 25,
+        totalQuestions: 15,
         isActive: true,
       },
       {
@@ -55,7 +55,7 @@ async function seed() {
         framework: "spring",
         durationMinutes: 10,
         passingScore: 60,
-        totalQuestions: 25,
+        totalQuestions: 15,
         isActive: true,
       },
       {
@@ -66,7 +66,7 @@ async function seed() {
         framework: "django",
         durationMinutes: 10,
         passingScore: 60,
-        totalQuestions: 25,
+        totalQuestions: 15,
         isActive: true,
       },
       {
@@ -77,7 +77,7 @@ async function seed() {
         framework: "express",
         durationMinutes: 10,
         passingScore: 60,
-        totalQuestions: 25,
+        totalQuestions: 15,
         isActive: true,
       },
       {
@@ -88,7 +88,7 @@ async function seed() {
         framework: "nextjs",
         durationMinutes: 10,
         passingScore: 60,
-        totalQuestions: 25,
+        totalQuestions: 15,
         isActive: true,
       },
     ];
@@ -137,13 +137,24 @@ async function seed() {
       });
     };
 
-    const allQuestions = [
+    const allQuestionsWithIds = [
       ...addStableIds(codeDesignQuestions, "cd"),
       ...addStableIds(architectureQuestions, "arch"),
       ...addStableIds(databaseQuestions, "db"),
       ...addStableIds(devopsQuestions, "ops"),
       ...addStableIds(qaQuestions, "qa"),
     ];
+
+    // 去除重复的题目（基于ID去重，保留第一个出现的）
+    const uniqueQuestionsMap = new Map<string, typeof allQuestionsWithIds[0]>();
+    for (const question of allQuestionsWithIds) {
+      if (!uniqueQuestionsMap.has(question.id)) {
+        uniqueQuestionsMap.set(question.id, question);
+      }
+    }
+    const allQuestions = Array.from(uniqueQuestionsMap.values());
+
+    console.log(`📊 去重前: ${allQuestionsWithIds.length} 题，去重后: ${allQuestions.length} 题`);
 
     // 分批插入/更新以避免一次性处理过多数据
     const batchSize = 20;
