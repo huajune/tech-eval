@@ -86,11 +86,11 @@ export function useAntiCheat({
       // 警告提示（3次就终止）
       if (serverWarnings === 2) {
         alert(
-          `⚠️ 最后警告 (${serverWarnings}/3)\n\n您已切换标签页${serverWarnings}次。\n\n再切换1次，考试将被强制终止！\n\n请专注于考试答题。`
+          `温馨提示 (${serverWarnings}/3)\n\n检测到您已离开答题页面${serverWarnings}次。\n\n为了确保考试的公平性，请您专注于答题页面。\n\n如再次离开，系统将自动结束本次考试。`
         );
       } else if (serverWarnings === 1) {
         alert(
-          `⚠️ 警告 (${serverWarnings}/3)\n\n检测到切换标签页或窗口。\n\n请专注于考试，不要离开答题页面。\n超过3次将被强制终止考试。`
+          `温馨提示 (${serverWarnings}/3)\n\n检测到您离开了答题页面。\n\n为了确保考试的公平性和有效性，请您保持在答题页面进行作答。\n\n感谢您的配合！`
         );
       }
     },
