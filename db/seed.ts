@@ -139,8 +139,9 @@ async function seed() {
         name: "测试工程师能力评估",
         description: "面向测试工程师的技术能力评估，全面考察测试能力",
         role: "tester",
-        language: undefined,
-        framework: undefined,
+        // 生产数据库 language 字段为 NOT NULL，测试岗位用占位值
+        language: "general",
+        framework: "general",
         durationMinutes: 10,
         passingScore: 60,
         totalQuestions: 15,
