@@ -1,7 +1,7 @@
 import { SeedQuestion } from "./types";
 
 export const devopsQuestions: SeedQuestion[] = [
-  // 简单题（6题）
+  // 简单题（2题）
   {
     content: "在 Webpack 构建中，Loader 和 Plugin 的区别是？",
     type: "single",
@@ -34,74 +34,6 @@ export const devopsQuestions: SeedQuestion[] = [
     weight: 1,
     applicableRoles: ["backend"],
     applicableLanguages: null,
-    explanation: "B对：top -H -p <pid>命令可以查看指定进程内各个线程的详细信息，包括CPU占用率，是定位Java程序中“某个线程CPU占满”问题的第一步。A错：查看文件句柄用lsof。C错：杀死进程用kill。D错：查看网络连接用netstat或ss。",
+    explanation: "B对：top -H -p <pid>命令可以查看指定进程内各个线程的详细信息，包括CPU占用率，是定位Java程序中\"某个线程CPU占满\"问题的第一步。A错：查看文件句柄用lsof。C错：杀死进程用kill。D错：查看网络连接用netstat或ss。",
   },
-  {
-    content: "线上服务 CPU 飙高，使用 top -H -p <pid> 命令的目的是？",
-    type: "single",
-    options: {
-      A: "查看该进程打开的文件句柄",
-      B: "查看该进程下的所有线程的 CPU 占用情况",
-      C: "强制杀死进程",
-      D: "查看网络连接数",
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "devops",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend"],
-    applicableLanguages: null,
-    explanation: "B对：top -H -p <pid>命令可以查看指定进程内各个线程的详细信息，包括CPU占用率，是定位Java程序中“某个线程CPU占满”问题的第一步。A错：查看文件句柄用lsof。C错：杀死进程用kill。D错：查看网络连接用netstat或ss。",
-  },
-  {
-    content: "在 Linux 服务器上，查看当前目录下文件大小时，使用哪个命令最直观？",
-    type: "single",
-    options: {
-      A: "ls -l",
-      B: "ls -lh",
-      C: "ps -ef",
-      D: "cat file",
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "devops",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend","backend","fullstack"],
-    applicableLanguages: null,
-    explanation: "-h 选项会以 K/M/G 等人类可读格式显示大小，最为直观。",
-  },
-  {
-    content: "发现服务器磁盘满了，使用什么命令组合能最快找到是哪个文件占用了最大空间？",
-    type: "single",
-    options: {
-      A: "ls -a",
-      B: "find / -name “*”",
-      C: "du -sh * | sort -rh | head",
-      D: "top",
-    },
-    correctAnswer: ["C"],
-    abilityDimension: "devops",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend","backend","fullstack"],
-    applicableLanguages: null,
-    explanation: "du -sh * 查看当前目录下所有文件和目录的大小，sort -rh 逆序（从大到小）排序，head 取前几行。",
-  },
-  {
-    content: "线上出现报错，你需要统计 error.log 日志中，“NullPointerException” 出现的次数，并按出现频率排序。以下哪些命令组合片段是相关的？",
-    type: "multiple",
-    options: {
-      A: "grep “NullPointerException” error.log",
-      B: "wc -l",
-      C: "sort | uniq -c",
-      D: "chmod +x",
-    },
-    correctAnswer: ["A","B","C"],
-    abilityDimension: "devops",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend","backend","fullstack"],
-    applicableLanguages: null,
-    explanation: "A：过滤出包含错误的行。B：统计行数（简单统计总数用）。C：排序并去重统计每种错误出现的次数（高级统计用）。完整命令可能是 grep “Error” log | sort | uniq -c | sort -nr。D 错：chmod 是修改文件权限的，与查看日志无关。考察点：Linux 管道组合命令的实际应用。",
-  }
 ];

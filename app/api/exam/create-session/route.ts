@@ -23,9 +23,17 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { role, language, framework } = body;
 
-    if (!role || !language) {
+    if (!role) {
       return NextResponse.json(
-        { error: "缺少必要参数：role, language" },
+        { error: "缺少必要参数：role" },
+        { status: 400 }
+      );
+    }
+
+    // 测试岗位不需要language参数
+    if (role !== "tester" && !language) {
+      return NextResponse.json(
+        { error: "缺少必要参数：language" },
         { status: 400 }
       );
     }
@@ -83,27 +91,61 @@ export async function POST(request: Request) {
     }
 
     // 5. 查找对应的考试模板
-    // 构建查询条件：role、language、isActive是必须的，framework是可选的
-    const whereConditions = [
+    // 测试岗位：只按role和isActive查询
+    // 其他岗位：按role、language、isActive查询，framework可选
+    let whereConditions = [
       eq(examsTable.role, role),
-      eq(examsTable.language, language),
       eq(examsTable.isActive, true),
     ];
 
-    // 如果提供了framework，则添加到查询条件中
-    if (framework) {
-      whereConditions.push(eq(examsTable.framework, framework));
+    if (role !== "tester") {
+      // 非测试岗位需要language
+      whereConditions.push(eq(examsTable.language, language));
+      // 如果提供了framework且不为空字符串，则添加到查询条件中
+      if (framework && framework.trim() !== "") {
+        whereConditions.push(eq(examsTable.framework, framework));
+      }
     }
 
-    const exams = await db
+    let exams = await db
       .select()
       .from(examsTable)
       .where(and(...whereConditions))
       .limit(1);
 
+    // 如果精确匹配找不到，且提供了framework，尝试不匹配framework（回退策略）
+    if (exams.length === 0 && role !== "tester" && framework && framework.trim() !== "") {
+      const fallbackConditions = [
+        eq(examsTable.role, role),
+        eq(examsTable.language, language),
+        eq(examsTable.isActive, true),
+      ];
+      
+      exams = await db
+        .select()
+        .from(examsTable)
+        .where(and(...fallbackConditions))
+        .limit(1);
+      
+      if (exams.length > 0) {
+        console.warn(`未找到精确匹配的模板（framework: ${framework}），使用回退策略找到模板: ${exams[0].id}`);
+      }
+    }
+
     if (exams.length === 0) {
+      // 添加更详细的错误信息用于调试
+      const debugInfo = {
+        role,
+        language: role !== "tester" ? language : undefined,
+        framework: role !== "tester" && framework && framework.trim() !== "" ? framework : undefined,
+      };
+      console.error("未找到匹配的考试模板:", debugInfo);
+      
       return NextResponse.json(
-        { error: "未找到匹配的考试模板" },
+        { 
+          error: "未找到匹配的考试模板，请确保已运行数据库种子数据（pnpm db:seed）",
+          debug: debugInfo 
+        },
         { status: 404 }
       );
     }
@@ -111,7 +153,11 @@ export async function POST(request: Request) {
     const exam = exams[0];
 
     // 6. 生成题目（调用题目选择算法）
-    const questions = await generateExamQuestions({ role, language, framework });
+    // 测试岗位只传递role，其他岗位传递role、language、framework
+    const examConfig = role === "tester"
+      ? { role }
+      : { role, language, framework };
+    const questions = await generateExamQuestions(examConfig);
 
     if (questions.length === 0) {
       return NextResponse.json(

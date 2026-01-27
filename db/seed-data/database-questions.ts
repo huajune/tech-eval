@@ -1,9 +1,9 @@
 import { SeedQuestion } from "./types";
 
 export const databaseQuestions: SeedQuestion[] = [
-  // 简单题（6题）
+  // 简单题（1题）
   {
-    content: "在 InnoDB 引擎的可重复读（Repeatable Read）隔离级别下，主要通过什么机制解决了大部分“幻读”问题？",
+    content: "在 InnoDB 引擎的可重复读（Repeatable Read）隔离级别下，主要通过什么机制解决了大部分\"幻读\"问题？",
     type: "single",
     options: {
       A: "悲观锁",
@@ -19,93 +19,8 @@ export const databaseQuestions: SeedQuestion[] = [
     applicableLanguages: null,
     explanation: "B对：InnoDB在RR级别下，通过MVCC（多版本并发控制）解决了快照读的幻读问题，通过Next-Key Lock（记录锁+间隙锁）解决了当前读的幻读问题。A/C/D错：它们并非InnoDB解决幻读的核心机制。",
   },
-  {
-    content: "在 InnoDB 引擎的可重复读（Repeatable Read）隔离级别下，主要通过什么机制解决了大部分“幻读”问题？",
-    type: "single",
-    options: {
-      A: "悲观锁",
-      B: "Next-Key Lock（临键锁）和 MVCC",
-      C: "读写分离",
-      D: "序列化",
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "database",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["backend"],
-    applicableLanguages: null,
-    explanation: "B对：InnoDB在RR级别下，通过MVCC（多版本并发控制）解决了快照读的幻读问题，通过Next-Key Lock（记录锁+间隙锁）解决了当前读的幻读问题。A/C/D错：它们并非InnoDB解决幻读的核心机制。",
-  },
-  {
-    content: "测试结束需要清理脏数据，删除表中所有数据但保留表结构的 SQL 是？",
-    type: "single",
-    options: {
-      A: "DROP TABLE table_name;",
-      B: "DELETE FROM table_name;",
-      C: "REMOVE ALL FROM table_name;",
-      D: "ALTER TABLE table_name DROP;",
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "database",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend","backend","fullstack"],
-    applicableLanguages: null,
-    explanation: "DELETE FROM 用于删除表中的数据但保留表结构，DROP TABLE 是删除整个表。",
-  },
-  {
-    content: "两个事务同时执行，事务 A 读到了事务 B 未提交的数据，这属于哪种隔离级别的问题？",
-    type: "single",
-    options: {
-      A: "脏读 (Dirty Read)",
-      B: "不可重复读",
-      C: "幻读",
-      D: "串行化",
-    },
-    correctAnswer: ["A"],
-    abilityDimension: "database",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend","backend","fullstack"],
-    applicableLanguages: null,
-    explanation: "脏读特指读到了另一个事务未提交的数据，通常发生在隔离级别最低的 Read Uncommitted 级别。",
-  },
-  {
-    content: "发现某条 SQL 查询语句执行非常慢（慢查询），为了分析原因，测试人员可以采取哪些手段？",
-    type: "multiple",
-    options: {
-      A: "在 SQL 语句前加上 EXPLAIN 关键字，查看执行计划（是否命中索引）。",
-      B: "检查 WHERE 条件字段的数据区分度（Selectivity），区分度太低（如性别）可能导致索引失效。",
-      C: "只要给查询涉及的所有字段都加上索引，一定能解决问题。",
-      D: "检查是否使用了 SELECT *，导致回表查询过多或传输数据量过大。",
-    },
-    correctAnswer: ["A","B","D"],
-    abilityDimension: "database",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend","backend","fullstack"],
-    applicableLanguages: null,
-    explanation: "A 对：最标准的排查手段。B 对：索引选择性差（如性别只有男女）会导致全表扫描。D 对：避免 Select * 是基础优化规范。C 错：索引不是越多越好，过多的索引会降低“写入/更新”速度，且不合理的联合索引可能根本用不上。考察点：数据库性能调优的基础意识。",
-  },
-  {
-    content: "作为测试人员，你需要验证后台报表中的“高价值用户列表”。数据库中有一张订单表 orders，包含字段：user_id (用户ID) 和 amount (订单金额)。 你需要写一条 SQL，筛选出 平均订单金额超过 500 元 的所有用户 ID。下列 SQL 正确的是？",
-    type: "single",
-    options: {
-      A: "SELECT user_id FROM orders WHERE AVG(amount) > 500 GROUP BY user_id;",
-      B: "SELECT user_id FROM orders GROUP BY user_id HAVING AVG(amount) > 500;",
-      C: "SELECT user_id FROM orders WHERE amount > 500 GROUP BY user_id;",
-      D: "SELECT DISTINCT user_id FROM orders WHERE AVG(amount) > 500;",
-    },
-    correctAnswer: ["B"],
-    abilityDimension: "database",
-    difficulty: "easy",
-    weight: 1,
-    applicableRoles: ["frontend","backend","fullstack"],
-    applicableLanguages: null,
-    explanation: "- A 错： WHERE 子句中不能直接使用聚合函数（如 AVG, SUM）。聚合后的过滤必须使用 HAVING。这是最经典的 SQL 面试坑。\n- B 对： 先 GROUP BY 用户，算出平均值，再用 HAVING 筛选平均值 > 500 的组。\n- C 错： 这条 SQL 的含义是“筛选出单笔订单大于 500 的用户”，而不是“平均金额”。\n- D 错： 语法错误，WHERE 中不能用 AVG。",
-  },
 
-  // 中等题（4题）
+  // 中等题（2题）
   {
     content: "现有 Service A 调用 Service B。A 方法上有事务 @Transactional，B 方法上配置了不同的传播行为。下列场景描述正确的有？",
     type: "multiple",
@@ -115,12 +30,12 @@ export const databaseQuestions: SeedQuestion[] = [
       C: "若 B 为 NESTED：B 报错回滚，A 可以选择捕获异常不回滚（B 是 A 的子事务/保存点）。",
       D: "若 B 为 SUPPORTS：如果 A 没有事务，B 就会新建一个事务运行。",
     },
-    correctAnswer: ["A","B","C"],
+    correctAnswer: ["A", "B", "C"],
     abilityDimension: "database",
     difficulty: "medium",
     weight: 1,
     applicableRoles: ["backend"],
-    applicableLanguages: ["Java"],
+    applicableLanguages: ["java"],
     explanation: "A对：REQUIRED（默认）表示加入当前事务，同属一个事务单元。B对：REQUIRES_NEW会挂起A的事务，新建一个独立事务，B的事务提交后不受A回滚影响。C对：NESTED在A的事务内创建一个保存点，B回滚到此保存点，A可捕获异常决定是否继续。D错：SUPPORTS表示如果当前存在事务则加入，否则以非事务方式运行，不会新建事务。",
   },
   {
@@ -132,7 +47,7 @@ export const databaseQuestions: SeedQuestion[] = [
       C: "Using temporary",
       D: "Using index condition",
     },
-    correctAnswer: ["B","C"],
+    correctAnswer: ["B", "C"],
     abilityDimension: "database",
     difficulty: "medium",
     weight: 1,
@@ -140,57 +55,4 @@ export const databaseQuestions: SeedQuestion[] = [
     applicableLanguages: null,
     explanation: "B/C对：Using filesort表示无法利用索引完成排序，需要在内存或磁盘进行额外排序，效率低。Using temporary表示需要创建临时表来处理查询（如GROUP BY、ORDER BY），可能消耗大量资源。A错：Using index表示使用了覆盖索引，是高效的表现。D错：Using index condition表示使用了索引下推（ICP），是优化特性。",
   },
-  {
-    content: "现有 Service A 调用 Service B。A 方法上有事务 @Transactional，B 方法上配置了不同的传播行为。下列场景描述正确的有？",
-    type: "multiple",
-    options: {
-      A: "若 B 为 REQUIRED：A 报错回滚，B 也会回滚（因为是同一个事务）。",
-      B: "若 B 为 REQUIRES_NEW：A 报错回滚，B 不会回滚（只要 B 执行成功）。",
-      C: "若 B 为 NESTED：B 报错回滚，A 可以选择捕获异常不回滚（B 是 A 的子事务/保存点）。",
-      D: "若 B 为 SUPPORTS：如果 A 没有事务，B 就会新建一个事务运行。",
-    },
-    correctAnswer: ["A","B","C"],
-    abilityDimension: "database",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["backend"],
-    applicableLanguages: ["Java"],
-    explanation: "A对：REQUIRED（默认）表示加入当前事务，同属一个事务单元。B对：REQUIRES_NEW会挂起A的事务，新建一个独立事务，B的事务提交后不受A回滚影响。C对：NESTED在A的事务内创建一个保存点，B回滚到此保存点，A可捕获异常决定是否继续。D错：SUPPORTS表示如果当前存在事务则加入，否则以非事务方式运行，不会新建事务。",
-  },
-  {
-    content: "执行 Explain 查看 SQL 执行计划时，若 Extra 列出现了以下哪些关键词，通常意味着需要优化 SQL 或索引？",
-    type: "multiple",
-    options: {
-      A: "Using index",
-      B: "Using filesort",
-      C: "Using temporary",
-      D: "Using index condition",
-    },
-    correctAnswer: ["B","C"],
-    abilityDimension: "database",
-    difficulty: "medium",
-    weight: 1,
-    applicableRoles: ["backend"],
-    applicableLanguages: null,
-    explanation: "B/C对：Using filesort表示无法利用索引完成排序，需要在内存或磁盘进行额外排序，效率低。Using temporary表示需要创建临时表来处理查询（如GROUP BY、ORDER BY），可能消耗大量资源。A错：Using index表示使用了覆盖索引，是高效的表现。D错：Using index condition表示使用了索引下推（ICP），是优化特性。",
-  },
-
-  // 困难题（1题）
-  {
-    content: "你需要从数据库中导出所有 “下过订单的用户” 的姓名（即排除掉那些注册了但没买东西的人）。 现有两张表：用户表 users (字段：id, name) 和订单表 orders (字段：order_id, user_id, amount)。下列哪些 SQL 语句可以 正确 查出“在 orders 表中有记录的用户姓名”？",
-    type: "multiple",
-    options: {
-      A: "SELECT DISTINCT u.name FROM users u INNER JOIN orders o ON u.id = o.user_id;",
-      B: "SELECT u.name FROM users u LEFT JOIN orders o ON u.id = o.user_id WHERE o.order_id IS NULL;",
-      C: "SELECT name FROM users WHERE id IN (SELECT user_id FROM orders);",
-      D: "SELECT name FROM users u WHERE EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id);",
-    },
-    correctAnswer: ["A","C","D"],
-    abilityDimension: "database",
-    difficulty: "hard",
-    weight: 1,
-    applicableRoles: ["frontend","backend","fullstack"],
-    applicableLanguages: null,
-    explanation: "- A 对 (INNER JOIN)： 内连接只保留两张表中都有关联的数据，正好筛选出“下过单的用户”。(加 DISTINCT 是为了去重，因为一个用户可能下多单)。\n- B 错 (逻辑相反)： LEFT JOIN 会保留所有用户，而 WHERE o.order_id IS NULL 是筛选出“右边没数据的行”。所以这句话查出来的是**“没下过订单的用户”**，与题目要求完全相反。这是考察对 LEFT JOIN 结果集过滤的经典考点。\n- C 对 (IN)： 筛选 ID 在订单表里的用户，逻辑正确。\n- D 对 (EXISTS)： 只要订单表存在关联记录就返回，逻辑正确且性能较好。",
-  }
 ];

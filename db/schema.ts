@@ -35,9 +35,9 @@ export const examsTable = pgTable("exams", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
-  role: varchar("role", { length: 50 }).notNull(), // 'frontend' | 'backend' | 'fullstack'
-  language: varchar("language", { length: 50 }).notNull(), // 'typescript' | 'java' | 'python'
-  framework: varchar("framework", { length: 100 }), // 'nextjs' | 'react' | 'spring' | 'django' | 'express'
+  role: varchar("role", { length: 50 }).notNull(), // 'frontend' | 'backend' | 'fullstack' | 'tester'
+  language: varchar("language", { length: 50 }), // 'typescript' | 'javascript' | 'java' | 'python' (可选，测试岗位为null)
+  framework: varchar("framework", { length: 100 }), // 'nextjs' | 'react' | 'vue' | 'spring' | 'django' | 'express' (可选)
   durationMinutes: integer("duration_minutes").default(10).notNull(),
   passingScore: integer("passing_score").default(60).notNull(),
   totalQuestions: integer("total_questions").default(15).notNull(),

@@ -88,15 +88,27 @@ export default function ExamSetupPage() {
     { value: "frontend", label: "前端开发工程师" },
     { value: "backend", label: "后端开发工程师" },
     { value: "fullstack", label: "全栈工程师" },
+    { value: "tester", label: "测试工程师" },
   ];
 
   // 根据角色动态获取可选语言
   const getLanguageOptions = () => {
+    // 测试岗位不需要选择语言
+    if (role === "tester") {
+      return [];
+    }
+    // 前端工程师支持TypeScript和JavaScript
+    if (role === "frontend") {
+      return [
+        { value: "typescript", label: "TypeScript" },
+        { value: "javascript", label: "JavaScript" },
+      ];
+    }
     // 全栈工程师目前只支持TypeScript
     if (role === "fullstack") {
       return [{ value: "typescript", label: "TypeScript" }];
     }
-    // 其他角色支持所有语言
+    // 后端工程师支持所有语言
     return [
       { value: "typescript", label: "TypeScript" },
       { value: "java", label: "Java" },
@@ -107,10 +119,22 @@ export default function ExamSetupPage() {
   const languageOptions = getLanguageOptions();
 
   const getFrameworkOptions = () => {
+    // 测试岗位不需要选择框架
+    if (role === "tester") {
+      return [];
+    }
     if (role === "frontend" && language === "typescript") {
       return [
         { value: "nextjs", label: "Next.js" },
         { value: "react", label: "React" },
+        { value: "vue", label: "Vue" },
+      ];
+    }
+    if (role === "frontend" && language === "javascript") {
+      return [
+        { value: "nextjs", label: "Next.js" },
+        { value: "react", label: "React" },
+        { value: "vue", label: "Vue" },
       ];
     }
     if (role === "backend" && language === "java") {
@@ -166,8 +190,13 @@ export default function ExamSetupPage() {
       }
     }
 
-    if (!role || !language) {
-      alert("请选择角色和编程语言");
+    // 测试岗位不需要选择语言和框架
+    if (!role) {
+      alert("请选择应聘岗位");
+      return;
+    }
+    if (role !== "tester" && !language) {
+      alert("请选择编程语言");
       return;
     }
 
@@ -208,10 +237,15 @@ export default function ExamSetupPage() {
       }
 
       // 2. 创建考试会话
+      // 测试岗位只传递role，其他岗位传递role、language、framework
+      const requestBody = role === "tester" 
+        ? { role } 
+        : { role, language, framework };
+      
       const response = await fetch("/api/exam/create-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role, language, framework }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -332,10 +366,12 @@ export default function ExamSetupPage() {
                     onChange={(e) => {
                       const newRole = e.target.value;
                       setRole(newRole);
-                      // 重置框架
+                      // 重置框架和语言
                       setFramework("");
-                      // 如果是全栈，自动设置为TypeScript；否则重置语言选择
-                      if (newRole === "fullstack") {
+                      // 如果是测试岗位，清空语言；如果是全栈，自动设置为TypeScript；否则重置语言选择
+                      if (newRole === "tester") {
+                        setLanguage("");
+                      } else if (newRole === "fullstack") {
                         setLanguage("typescript");
                       } else {
                         setLanguage("");
@@ -349,38 +385,40 @@ export default function ExamSetupPage() {
             </div>
           </div>
 
-          {/* 语言选择 */}
-          <div className="space-y-2">
-            <Label>选择编程语言</Label>
-            <div className="grid grid-cols-3 gap-2">
-              {languageOptions.map((option) => (
-                <label
-                  key={option.value}
-                  className={`flex items-center justify-center space-x-2 p-3 border rounded-md cursor-pointer transition ${
-                    language === option.value
-                      ? "border-primary bg-primary/5"
-                      : "border-gray-300 hover:border-gray-400"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="language"
-                    value={option.value}
-                    checked={language === option.value}
-                    onChange={(e) => {
-                      setLanguage(e.target.value);
-                      setFramework("");
-                    }}
-                    className="h-4 w-4"
-                  />
-                  <span>{option.label}</span>
-                </label>
-              ))}
+          {/* 语言选择（测试岗位不显示） */}
+          {role !== "tester" && (
+            <div className="space-y-2">
+              <Label>选择编程语言</Label>
+              <div className="grid grid-cols-3 gap-2">
+                {languageOptions.map((option) => (
+                  <label
+                    key={option.value}
+                    className={`flex items-center justify-center space-x-2 p-3 border rounded-md cursor-pointer transition ${
+                      language === option.value
+                        ? "border-primary bg-primary/5"
+                        : "border-gray-300 hover:border-gray-400"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="language"
+                      value={option.value}
+                      checked={language === option.value}
+                      onChange={(e) => {
+                        setLanguage(e.target.value);
+                        setFramework("");
+                      }}
+                      className="h-4 w-4"
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* 框架选择（如果有可选框架） */}
-          {frameworkOptions.length > 0 && (
+          {/* 框架选择（如果有可选框架，且不是测试岗位） */}
+          {role !== "tester" && frameworkOptions.length > 0 && (
             <div className="space-y-2">
               <Label>选择框架</Label>
               <div className="grid grid-cols-2 gap-2">
@@ -414,8 +452,7 @@ export default function ExamSetupPage() {
             disabled={
               loading ||
               !role ||
-              !language ||
-              (frameworkOptions.length > 0 && !framework)
+              (role !== "tester" && (!language || (frameworkOptions.length > 0 && !framework)))
             }
             className="w-full"
             size="lg"

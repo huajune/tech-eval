@@ -8,7 +8,7 @@ export interface SeedQuestion {
   abilityDimension: "code_design" | "architecture" | "database" | "devops" | "qa_testing";
   difficulty: "easy" | "medium" | "hard";
   weight: number;
-  applicableRoles: ("frontend" | "backend" | "fullstack")[];
+  applicableRoles: ("frontend" | "backend" | "fullstack" | "tester")[];
   applicableLanguages: string[] | null;
   explanation: string;
   referenceAnswer?: string;

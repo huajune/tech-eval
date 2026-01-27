@@ -3,14 +3,14 @@ import { questionsTable } from "@/db/schema";
 import { and, isNull, or, sql } from "drizzle-orm";
 
 export interface ExamConfig {
-  role: "frontend" | "backend" | "fullstack";
-  language: "typescript" | "java" | "python";
+  role: "frontend" | "backend" | "fullstack" | "tester";
+  language?: "typescript" | "javascript" | "java" | "python";
   framework?: string;
 }
 
 // 白名单枚举用于运行时校验
-const VALID_ROLES = ["frontend", "backend", "fullstack"] as const;
-const VALID_LANGUAGES = ["typescript", "java", "python"] as const;
+const VALID_ROLES = ["frontend", "backend", "fullstack", "tester"] as const;
+const VALID_LANGUAGES = ["typescript", "javascript", "java", "python"] as const;
 
 /**
  * 校验配置参数，防止SQL注入
@@ -19,7 +19,11 @@ function validateConfig(config: ExamConfig): void {
   if (!VALID_ROLES.includes(config.role)) {
     throw new Error(`无效的角色参数: ${config.role}`);
   }
-  if (!VALID_LANGUAGES.includes(config.language)) {
+  // 测试岗位不需要language参数
+  if (config.role !== "tester" && !config.language) {
+    throw new Error(`缺少必要参数：language`);
+  }
+  if (config.language && !VALID_LANGUAGES.includes(config.language)) {
     throw new Error(`无效的编程语言参数: ${config.language}`);
   }
 }
@@ -105,6 +109,24 @@ export async function generateExamQuestions(
     validateConfig(config);
 
     // 1. 筛选适用题目（使用参数化JSONB查询）
+    // 所有岗位都按applicableRoles筛选，测试岗位不需要language参数
+    let whereCondition;
+    if (config.role === "tester") {
+      // 测试岗位：按applicableRoles筛选（包含"tester"的题目）
+      whereCondition = sql`${questionsTable.applicableRoles} @> ${JSON.stringify([config.role])}::jsonb`;
+    } else {
+      // 其他岗位：按角色和语言筛选
+      whereCondition = and(
+        // 角色匹配：applicable_roles 包含当前角色（参数化查询）
+        sql`${questionsTable.applicableRoles} @> ${JSON.stringify([config.role])}::jsonb`,
+        // 语言匹配：applicable_languages 为 null（通用） 或包含当前语言
+        or(
+          isNull(questionsTable.applicableLanguages),
+          sql`${questionsTable.applicableLanguages} @> ${JSON.stringify([config.language!])}::jsonb`
+        )
+      );
+    }
+
     const allQuestions = await db
       .select({
         id: questionsTable.id,
@@ -118,17 +140,7 @@ export async function generateExamQuestions(
         applicableLanguages: questionsTable.applicableLanguages,
       })
       .from(questionsTable)
-      .where(
-        and(
-          // 角色匹配：applicable_roles 包含当前角色（参数化查询）
-          sql`${questionsTable.applicableRoles} @> ${JSON.stringify([config.role])}::jsonb`,
-          // 语言匹配：applicable_languages 为 null（通用） 或包含当前语言
-          or(
-            isNull(questionsTable.applicableLanguages),
-            sql`${questionsTable.applicableLanguages} @> ${JSON.stringify([config.language])}::jsonb`
-          )
-        )
-      );
+      .where(whereCondition);
 
     if (allQuestions.length === 0) {
       throw new Error("没有找到符合条件的题目");
@@ -149,105 +161,83 @@ export async function generateExamQuestions(
 
     const grouped = groupQuestions(typedQuestions);
 
-    // 3. 按策略抽题（优先按分布，不足时从其他难度补全，确保总数15题）
+    // 3. 按策略抽题：优先抽满15题，从对应的applicableRoles抽取，题目充足时再考虑难度分布
     const selected: Question[] = [];
     const warnings: string[] = [];
     const targetTotal = 15; // 目标总数
-    const targetEasy = 10; // 目标简单题数
-    const targetMedium = 5; // 目标中等题数
+    const targetEasy = 10; // 目标简单题数（题目充足时）
+    const targetMedium = 5; // 目标中等题数（题目充足时）
 
-    // 第一步：按维度优先抽取（每个维度3题：2易+1中）
-    for (const [dimension, distribution] of Object.entries(
-      QUESTION_DISTRIBUTION
-    )) {
-      for (const [difficulty, count] of Object.entries(distribution)) {
-        if (count > 0) {
-          const pool = grouped[dimension]?.[difficulty] || [];
+    // 第一步：收集所有可用的题目（按难度分组，不限制维度）
+    const allEasy: Question[] = [];
+    const allMedium: Question[] = [];
+    const allHard: Question[] = [];
+    
+    for (const dimension of Object.keys(QUESTION_DISTRIBUTION)) {
+      allEasy.push(...(grouped[dimension]?.easy || []));
+      allMedium.push(...(grouped[dimension]?.medium || []));
+      allHard.push(...(grouped[dimension]?.hard || []));
+    }
 
-          if (pool.length === 0) {
-            // 完全没有题目，记录警告
-            warnings.push(
-              `${dimension} - ${difficulty} 无可用题目（需要${count}题）`
-            );
-          } else if (pool.length < count) {
-            // 题目不足，使用所有可用题目
-            warnings.push(
-              `${dimension} - ${difficulty} 题目不足：需要${count}题，实际${pool.length}题，将使用全部${pool.length}题`
-            );
-            selected.push(...pool);
-          } else {
-            // 题目充足，随机抽取
-            selected.push(...selectRandom(pool, count));
-          }
-        }
+    // 第二步：优先抽取easy题目到10题（如果题目充足）
+    if (allEasy.length >= targetEasy) {
+      selected.push(...selectRandom(allEasy, targetEasy));
+    } else {
+      // easy题目不足，使用所有easy题目
+      selected.push(...allEasy);
+      warnings.push(`easy题目不足：需要${targetEasy}题，实际${allEasy.length}题`);
+    }
+
+    // 第三步：抽取medium题目到5题（如果题目充足，且排除已选中的题目）
+    const selectedIds = new Set(selected.map(q => q.id));
+    const availableMedium = allMedium.filter(q => !selectedIds.has(q.id));
+    
+    if (availableMedium.length >= targetMedium) {
+      selected.push(...selectRandom(availableMedium, targetMedium));
+    } else {
+      // medium题目不足，使用所有可用的medium题目
+      selected.push(...availableMedium);
+      if (availableMedium.length < targetMedium) {
+        warnings.push(`medium题目不足：需要${targetMedium}题，实际${availableMedium.length}题`);
       }
     }
 
-    // 第二步：统计当前简单题和中等题数量
-    const currentEasy = selected.filter(q => q.difficulty === 'easy').length;
-    const currentMedium = selected.filter(q => q.difficulty === 'medium').length;
+    // 第四步：如果总数不足15题，从剩余题目中补全（优先easy，其次medium，最后hard）
     const currentTotal = selected.length;
-
-    // 第三步：如果总数不足15题，从其他难度补全
     if (currentTotal < targetTotal) {
       const needed = targetTotal - currentTotal;
-      
-      // 收集所有未选中的题目（按难度分组）
-      const selectedIds = new Set(selected.map(q => q.id));
-      const allEasy: Question[] = [];
-      const allMedium: Question[] = [];
-      
-      for (const dimension of Object.keys(QUESTION_DISTRIBUTION)) {
-        const easyPool = (grouped[dimension]?.easy || []).filter(q => !selectedIds.has(q.id));
-        const mediumPool = (grouped[dimension]?.medium || []).filter(q => !selectedIds.has(q.id));
-        allEasy.push(...easyPool);
-        allMedium.push(...mediumPool);
-      }
-
-      // 优先补全简单题到10题，然后补全中等题到5题，最后补全总数到15题
       let remaining = needed;
       
-      // 1. 如果简单题不足10题，先补简单题
-      if (currentEasy < targetEasy && allEasy.length > 0) {
-        const easyNeeded = Math.min(targetEasy - currentEasy, remaining, allEasy.length);
-        const additionalEasy = selectRandom(allEasy, easyNeeded);
-        selected.push(...additionalEasy);
-        remaining -= easyNeeded;
-        // 更新已选中的ID集合
-        additionalEasy.forEach(q => selectedIds.add(q.id));
+      // 更新已选中的ID集合
+      const currentSelectedIds = new Set(selected.map(q => q.id));
+      
+      // 优先从easy题目补全
+      const remainingEasy = allEasy.filter(q => !currentSelectedIds.has(q.id));
+      if (remainingEasy.length > 0 && remaining > 0) {
+        const easyToAdd = Math.min(remaining, remainingEasy.length);
+        selected.push(...selectRandom(remainingEasy, easyToAdd));
+        remaining -= easyToAdd;
+        remainingEasy.forEach(q => currentSelectedIds.add(q.id));
       }
       
-      // 2. 如果中等题不足5题，补中等题（需要排除已选中的）
-      const currentMediumAfterEasy = selected.filter(q => q.difficulty === 'medium').length;
-      if (currentMediumAfterEasy < targetMedium && remaining > 0) {
-        const availableMedium = allMedium.filter(q => !selectedIds.has(q.id));
-        if (availableMedium.length > 0) {
-          const mediumNeeded = Math.min(targetMedium - currentMediumAfterEasy, remaining, availableMedium.length);
-          const additionalMedium = selectRandom(availableMedium, mediumNeeded);
-          selected.push(...additionalMedium);
-          remaining -= mediumNeeded;
-          // 更新已选中的ID集合
-          additionalMedium.forEach(q => selectedIds.add(q.id));
-        }
-      }
-      
-      // 3. 如果还需要更多题目，优先从简单题补，其次从中等题补
+      // 其次从medium题目补全
       if (remaining > 0) {
-        // 更新可用题目列表（排除已选中的）
-        const availableEasy = allEasy.filter(q => !selectedIds.has(q.id));
-        const availableMedium = allMedium.filter(q => !selectedIds.has(q.id));
-        
-        // 优先从简单题补，如果简单题不够再从中等题补
-        if (availableEasy.length > 0) {
-          const easyToAdd = Math.min(remaining, availableEasy.length);
-          selected.push(...selectRandom(availableEasy, easyToAdd));
-          remaining -= easyToAdd;
-        }
-        
-        if (availableMedium.length > 0 && remaining > 0) {
-          const mediumToAdd = Math.min(remaining, availableMedium.length);
-          selected.push(...selectRandom(availableMedium, mediumToAdd));
+        const remainingMedium = allMedium.filter(q => !currentSelectedIds.has(q.id));
+        if (remainingMedium.length > 0) {
+          const mediumToAdd = Math.min(remaining, remainingMedium.length);
+          selected.push(...selectRandom(remainingMedium, mediumToAdd));
           remaining -= mediumToAdd;
+          remainingMedium.forEach(q => currentSelectedIds.add(q.id));
+        }
+      }
+      
+      // 最后从hard题目补全（如果还需要）
+      if (remaining > 0) {
+        const remainingHard = allHard.filter(q => !currentSelectedIds.has(q.id));
+        if (remainingHard.length > 0) {
+          const hardToAdd = Math.min(remaining, remainingHard.length);
+          selected.push(...selectRandom(remainingHard, hardToAdd));
+          remaining -= hardToAdd;
         }
       }
       
@@ -256,12 +246,12 @@ export async function generateExamQuestions(
       }
     }
 
-    // 第四步：记录警告信息
+    // 第五步：记录警告信息
     if (warnings.length > 0) {
       console.warn(`题库部分不足：\n${warnings.join('\n')}`);
     }
 
-    // 第五步：验证题目数量
+    // 第六步：验证题目数量
     const finalTotal = selected.length;
     const finalEasy = selected.filter(q => q.difficulty === 'easy').length;
     const finalMedium = selected.filter(q => q.difficulty === 'medium').length;

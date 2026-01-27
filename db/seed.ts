@@ -48,6 +48,50 @@ async function seed() {
         isActive: true,
       },
       {
+        name: "前端工程师能力评估-TypeScript-Vue",
+        description: "面向前端工程师的技术能力评估，重点考察Vue开发能力",
+        role: "frontend",
+        language: "typescript",
+        framework: "vue",
+        durationMinutes: 10,
+        passingScore: 60,
+        totalQuestions: 15,
+        isActive: true,
+      },
+      {
+        name: "前端工程师能力评估-JavaScript-React",
+        description: "面向前端工程师的技术能力评估，重点考察React开发能力",
+        role: "frontend",
+        language: "javascript",
+        framework: "react",
+        durationMinutes: 10,
+        passingScore: 60,
+        totalQuestions: 15,
+        isActive: true,
+      },
+      {
+        name: "前端工程师能力评估-JavaScript-Vue",
+        description: "面向前端工程师的技术能力评估，重点考察Vue开发能力",
+        role: "frontend",
+        language: "javascript",
+        framework: "vue",
+        durationMinutes: 10,
+        passingScore: 60,
+        totalQuestions: 15,
+        isActive: true,
+      },
+      {
+        name: "前端工程师能力评估-JavaScript-Next.js",
+        description: "面向前端工程师的技术能力评估，重点考察Next.js开发能力",
+        role: "frontend",
+        language: "javascript",
+        framework: "nextjs",
+        durationMinutes: 10,
+        passingScore: 60,
+        totalQuestions: 15,
+        isActive: true,
+      },
+      {
         name: "后端工程师能力评估-Java-Spring",
         description: "面向后端工程师的技术能力评估，重点考察Spring Boot开发能力",
         role: "backend",
@@ -91,11 +135,26 @@ async function seed() {
         totalQuestions: 15,
         isActive: true,
       },
+      {
+        name: "测试工程师能力评估",
+        description: "面向测试工程师的技术能力评估，全面考察测试能力",
+        role: "tester",
+        language: undefined,
+        framework: undefined,
+        durationMinutes: 10,
+        passingScore: 60,
+        totalQuestions: 15,
+        isActive: true,
+      },
     ];
 
-    // 为每个模板生成稳定的UUID（基于role+language+framework）
+    // 为每个模板生成稳定的UUID
+    // 测试岗位：基于role生成
+    // 其他岗位：基于role+language+framework生成
     const examsWithIds = examTemplates.map((exam) => {
-      const identifier = `exam:${exam.role}:${exam.language}:${exam.framework || 'default'}`;
+      const identifier = exam.role === "tester"
+        ? `exam:${exam.role}`
+        : `exam:${exam.role}:${exam.language}:${exam.framework || 'default'}`;
       const id = uuidv5(identifier, QUESTION_NAMESPACE);
       return { ...exam, id };
     });
