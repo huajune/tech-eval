@@ -3,6 +3,7 @@ import {
   answersTable,
   examResultsTable,
   examSessionsTable,
+  examsTable,
   questionsTable,
 } from "@/db/schema";
 import { eq, inArray } from "drizzle-orm";
@@ -41,6 +42,20 @@ export async function calculateExamResult(sessionId: string) {
     if (!selectedQuestionIds || selectedQuestionIds.length === 0) {
       throw new Error("会话中没有选定的题目");
     }
+
+    // 1.1 获取考试信息，确定角色
+    const exams = await db
+      .select()
+      .from(examsTable)
+      .where(eq(examsTable.id, session.examId))
+      .limit(1);
+
+    if (exams.length === 0) {
+      throw new Error("考试不存在");
+    }
+
+    const exam = exams[0];
+    const role = exam.role as "frontend" | "backend" | "fullstack" | "tester";
 
     // 2. 获取所有选定的题目（包括未作答的）
     const questions = await db
@@ -115,15 +130,37 @@ export async function calculateExamResult(sessionId: string) {
         total > 0 ? Math.round((score / total) * 100) : 0;
     }
 
-    // 5. 计算加权总分
-    // 代码20% + 架构20% + 数据库20% + 运维20% + QA20%
-    const totalScore = Math.round(
-      (normalizedScores.code_design || 0) * 0.2 +
-        (normalizedScores.architecture || 0) * 0.2 +
-        (normalizedScores.database || 0) * 0.2 +
-        (normalizedScores.devops || 0) * 0.2 +
-        (normalizedScores.qa_testing || 0) * 0.2
-    );
+    // 5. 根据角色计算加权总分
+    let totalScore: number;
+    if (role === "tester") {
+      // 测试角色：根据实际抽到的题目在各维度的分布动态计算权重
+      // 计算每个维度的题目总数（作为权重依据）
+      const dimensionWeights: Record<string, number> = {};
+      let totalQuestions = 0;
+      
+      for (const question of questions) {
+        const dim = question.abilityDimension;
+        dimensionWeights[dim] = (dimensionWeights[dim] || 0) + 1;
+        totalQuestions += 1;
+      }
+      
+      // 根据题目数量分配权重
+      totalScore = 0;
+      for (const [dimension, count] of Object.entries(dimensionWeights)) {
+        const weight = count / totalQuestions;
+        totalScore += (normalizedScores[dimension] || 0) * weight;
+      }
+      totalScore = Math.round(totalScore);
+    } else {
+      // 其他角色：各维度平均分配20%
+      totalScore = Math.round(
+        (normalizedScores.code_design || 0) * 0.2 +
+          (normalizedScores.architecture || 0) * 0.2 +
+          (normalizedScores.database || 0) * 0.2 +
+          (normalizedScores.devops || 0) * 0.2 +
+          (normalizedScores.qa_testing || 0) * 0.2
+      );
+    }
 
     // 6. 职级映射
     const estimatedLevel = mapScoreToLevel(totalScore);
